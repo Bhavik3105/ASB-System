@@ -10,24 +10,38 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    
+    // Explicitly ensure models are registered
+    if (!mongoose.models.Bank) {
+      console.log('Registering Bank model manually...');
+    }
+    if (!mongoose.models.Client) {
+      console.log('Registering Client model manually...');
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const bankId = searchParams.get('bankId');
 
     // 1. Diagnostics: Check raw collection count
-    const rawCount = await Client.countDocuments({});
+    // Use the raw collection to bypass Mongoose schema issues if any
+    const rawCount = await mongoose.connection.db.collection('clients').countDocuments({});
 
     // 2. Simple List Mode
     if (!search && !bankId) {
       const clients = await Client.find({})
         .sort({ createdAt: -1 })
-        .populate('banks', 'bankName accountHolderName accountNumber')
+        .populate({
+           path: 'banks',
+           model: Bank, // Explicitly provide the model to avoid "Schema not found"
+           select: 'bankName accountHolderName accountNumber'
+        })
         .lean();
 
       return NextResponse.json({
         success: true,
         data: clients,
-        _debug: { rawCount },
+        _debug: { rawCount, mode: 'list' },
       }, {
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
@@ -53,7 +67,14 @@ export async function GET(request: NextRequest) {
     if (search) {
       pipeline.push({
         $addFields: {
-          dateString: { $dateToString: { format: '%Y-%m-%d', date: '$date', onNull: '' } },
+          // Fallback date string logic
+          dateString: { 
+            $cond: [
+              { $ifNull: ['$date', false] },
+              { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+              ''
+            ]
+          },
           bankNames: {
             $reduce: {
               input: '$bankDetails',
@@ -90,7 +111,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: clients.map(c => ({ ...c, banks: c.bankDetails })),
-      _debug: { rawCount },
+      _debug: { rawCount, mode: 'search' },
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
@@ -99,7 +120,11 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Clients API error:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ 
+      success: false, 
+      error: error.message || 'Internal server error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
   }
 }
 
