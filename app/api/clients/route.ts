@@ -134,9 +134,9 @@ export async function GET(request: NextRequest) {
       data: mappedClients,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Clients API error:', error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -159,8 +159,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data: client }, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Clients API error:', error);
+    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

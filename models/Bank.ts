@@ -28,11 +28,6 @@ const BankSchema = new Schema<IBank>(
 BankSchema.index({ bankName: 1 });
 BankSchema.index({ accountNumber: 1 });
 
-// Force delete cached model to apply schema changes in development
-if (mongoose.models.Bank) {
-  delete mongoose.models.Bank;
-}
-
-const Bank: Model<IBank> = mongoose.model<IBank>('Bank', BankSchema);
+const Bank: Model<IBank> = mongoose.models.Bank || mongoose.model<IBank>('Bank', BankSchema);
 
 export default Bank;

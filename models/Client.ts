@@ -46,6 +46,10 @@ ClientSchema.index(
   { name: 'client_text_search' }
 );
 
-const Client: Model<IClient> =
-  mongoose.models.Client || mongoose.model<IClient>('Client', ClientSchema);
+// Force delete cached model to apply schema changes in development
+if (mongoose.models.Client) {
+  delete mongoose.models.Client;
+}
+
+const Client: Model<IClient> = mongoose.model<IClient>('Client', ClientSchema);
 export default Client;
