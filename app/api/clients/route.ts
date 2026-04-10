@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
             { mobileNumber: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
             { reference: { $regex: search, $options: 'i' } },
-            { amountString: { $regex: search, $options: 'i' } },
+            { priceString: { $regex: search, $options: 'i' } },
             { dateString: { $regex: search, $options: 'i' } },
             { bankNames: { $regex: search, $options: 'i' } }
           ]
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
           { $limit: limit },
           {
             $project: {
-              amountString: 0,
+              priceString: 0,
               dateString: 0,
               bankNames: 0,
               bankDetailsLookup: 0,
