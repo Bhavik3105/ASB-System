@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import DataTable from '@/components/tables/DataTable';
 import { TrendingUp, Calendar, Plus, ArrowDownCircle, ArrowUpCircle, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -9,6 +10,7 @@ import TransactionModal from '@/components/forms/TransactionModal';
 import DailyBreakdownModal from '@/components/forms/DailyBreakdownModal';
 
 export default function CommissionsPage() {
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -24,7 +26,7 @@ export default function CommissionsPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams(filters);
-      const res = await fetch(`/api/commissions/daily?${params}`);
+      const res = await fetch(`/api/commissions/daily?${params}`, { cache: 'no-store' });
       const json = await res.json();
       if (json.success) setData(json.data);
     } catch {
@@ -185,7 +187,10 @@ export default function CommissionsPage() {
       <TransactionModal 
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
-        onSuccess={fetchDailyCommissions} 
+        onSuccess={() => {
+          fetchDailyCommissions();
+          router.refresh();
+        }} 
         hideBankClient={true}
         dualEntry={true}
       />
@@ -195,7 +200,10 @@ export default function CommissionsPage() {
         isOpen={isBreakdownOpen}
         onClose={() => setIsBreakdownOpen(false)}
         date={selectedDate}
-        onSuccess={fetchDailyCommissions}
+        onSuccess={() => {
+          fetchDailyCommissions();
+          router.refresh();
+        }}
       />
     </div>
   );

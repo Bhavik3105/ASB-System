@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { X, Pencil, Trash2, Plus, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -14,6 +15,7 @@ interface DailyBreakdownModalProps {
 }
 
 export default function DailyBreakdownModal({ isOpen, onClose, date, onSuccess }: DailyBreakdownModalProps) {
+  const router = useRouter();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -22,7 +24,7 @@ export default function DailyBreakdownModal({ isOpen, onClose, date, onSuccess }
   const fetchDayTransactions = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/transactions?startDate=${date}&endDate=${date}`);
+      const res = await fetch(`/api/transactions?startDate=${date}&endDate=${date}`, { cache: 'no-store' });
       const json = await res.json();
       if (json.success) setTransactions(json.data);
     } catch {
@@ -45,6 +47,7 @@ export default function DailyBreakdownModal({ isOpen, onClose, date, onSuccess }
         toast.success('Entry deleted');
         fetchDayTransactions();
         onSuccess(); // Update main table total
+        router.refresh();
       } else {
         toast.error(json.error || 'Delete failed');
       }
@@ -143,6 +146,7 @@ export default function DailyBreakdownModal({ isOpen, onClose, date, onSuccess }
           onSuccess={() => {
             fetchDayTransactions();
             onSuccess();
+            router.refresh();
           }}
           initialData={editingTransaction?._id ? editingTransaction : null}
           hideBankClient={true}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import DataTable from '@/components/tables/DataTable';
 import { Wallet, Plus, Pencil, Banknote, ArrowLeftRight, TrendingDown, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -9,6 +10,7 @@ import EmployeeModal from '@/components/forms/EmployeeModal';
 import SalaryModal from '@/components/forms/SalaryModal';
 
 export default function SalaryPage() {
+  const router = useRouter();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -21,7 +23,7 @@ export default function SalaryPage() {
   const fetchSalaries = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/salaries?month=${month}&year=${year}`);
+      const res = await fetch(`/api/salaries?month=${month}&year=${year}`, { cache: 'no-store' });
       const json = await res.json();
       if (json.success) setData(json.data);
     } catch {
@@ -52,6 +54,7 @@ export default function SalaryPage() {
       if (json.success) {
         toast.success('Salary record deleted');
         fetchSalaries();
+        router.refresh();
       } else {
         toast.error(json.error || 'Delete failed');
       }
