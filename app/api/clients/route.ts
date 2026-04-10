@@ -11,39 +11,33 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-    const limit = Math.min(100, parseInt(searchParams.get('limit') || '20'));
     const search = searchParams.get('search');
     const bankId = searchParams.get('bankId');
 
-    // SAFE LIST MODE: If no search or bank filter, use stable find()
+    // 1. Diagnostics: Check raw collection count
+    const rawCount = await Client.countDocuments({});
+
+    // 2. Simple List Mode
     if (!search && !bankId) {
-      const [clients, total] = await Promise.all([
-        Client.find({})
-          .sort({ createdAt: -1 })
-          .skip((page - 1) * limit)
-          .limit(limit)
-          .populate('banks', 'bankName accountHolderName accountNumber')
-          .lean(),
-        Client.countDocuments({}),
-      ]);
+      const clients = await Client.find({})
+        .sort({ createdAt: -1 })
+        .populate('banks', 'bankName accountHolderName accountNumber')
+        .lean();
 
       return NextResponse.json({
         success: true,
         data: clients,
-        pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+        _debug: { rawCount },
       }, {
         headers: {
-          'Cache-Control': 'no-store, max-age=0',
+          'Cache-Control': 'no-store, max-age=0, must-revalidate',
+          'Pragma': 'no-cache',
         }
       });
     }
 
-    // ADVANCED SEARCH MODE: Use robust aggregation
-    const pipeline: any[] = [];
-
-    // Lookup banks for search and population
-    pipeline.push(
+    // 3. Search Mode (Simplified Aggregation)
+    const pipeline: any[] = [
       {
         $lookup: {
           from: 'banks',
@@ -52,28 +46,15 @@ export async function GET(request: NextRequest) {
           as: 'bankDetails'
         }
       }
-    );
+    ];
 
-    // Prepare search fields
     if (search) {
       pipeline.push({
         $addFields: {
-          dateString: { 
-            $cond: [
-              { $gt: ['$date', null] },
-              { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
-              ''
-            ]
-          },
-          bankDetailsLookup: { $ifNull: ['$bankDetails', []] }
-        }
-      });
-
-      pipeline.push({
-        $addFields: {
+          dateString: { $dateToString: { format: '%Y-%m-%d', date: '$date', onNull: '' } },
           bankNames: {
             $reduce: {
-              input: '$bankDetailsLookup',
+              input: '$bankDetails',
               initialValue: '',
               in: { $concat: ['$$value', ' ', { $ifNull: ['$$this.bankName', ''] }] }
             }
@@ -86,7 +67,6 @@ export async function GET(request: NextRequest) {
           $or: [
             { personName: { $regex: search, $options: 'i' } },
             { mobileNumber: { $regex: search, $options: 'i' } },
-            { email: { $regex: search, $options: 'i' } },
             { reference: { $regex: search, $options: 'i' } },
             { dateString: { $regex: search, $options: 'i' } },
             { bankNames: { $regex: search, $options: 'i' } }
@@ -98,49 +78,23 @@ export async function GET(request: NextRequest) {
     if (bankId) {
       try {
         pipeline.push({ $match: { banks: new mongoose.Types.ObjectId(bankId) } });
-      } catch {
-        // Handle invalid ObjectId
-      }
+      } catch (e) {}
     }
 
-    // Pagination and Sort
-    pipeline.push({
-      $facet: {
-        metadata: [{ $count: 'total' }],
-        data: [
-          { $sort: { createdAt: -1 } },
-          { $skip: (page - 1) * limit },
-          { $limit: limit },
-          {
-            $project: {
-              dateString: 0,
-              bankNames: 0,
-              bankDetailsLookup: 0,
-              bankDetails: 1
-            }
-          }
-        ]
-      }
-    });
+    pipeline.push({ $sort: { createdAt: -1 } });
 
-    const result = await Client.aggregate(pipeline);
-    const clients = result[0]?.data || [];
-    const total = result[0]?.metadata[0]?.total || 0;
-
-    const mappedClients = clients.map((c: any) => ({
-      ...c,
-      banks: c.bankDetails || []
-    }));
+    const clients = await Client.aggregate(pipeline);
 
     return NextResponse.json({
       success: true,
-      data: mappedClients,
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      data: clients.map(c => ({ ...c, banks: c.bankDetails })),
+      _debug: { rawCount },
     }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',
       }
     });
+
   } catch (error: any) {
     console.error('Clients API error:', error);
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
