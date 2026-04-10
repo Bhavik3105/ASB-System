@@ -138,19 +138,6 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
                 onChange={(e) => setForm({ ...form, dailyLimit: parseFloat(e.target.value) || 0 })}
               />
             </div>
-
-            <div>
-              <label className="label">Daily Limit (₹)</label>
-              <input
-                type="number"
-                className="input"
-                placeholder="500000"
-                value={form.dailyLimit}
-                onChange={(e) => setForm({ ...form, dailyLimit: parseFloat(e.target.value) || 0 })}
-              />
-            </div>
-
-            </div>
           </div>
 
           <div className="modal-footer">
