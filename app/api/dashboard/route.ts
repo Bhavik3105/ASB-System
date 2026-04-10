@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import Expense from '@/models/Expense';
-import Purchase from '@/models/Purchase';
 import { getStartOfDay, getEndOfDay, getStartOfMonth, getEndOfMonth } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
@@ -72,9 +71,6 @@ export async function GET(request: NextRequest) {
       { $group: { _id: '$type', total: { $sum: '$amount' } } },
     ]);
 
-    // Pending purchases count
-    const pendingPurchases = await Purchase.countDocuments({ status: { $in: ['Pending', 'Partially Paid'] } });
-
     return NextResponse.json({
       success: true,
       data: {
@@ -84,7 +80,6 @@ export async function GET(request: NextRequest) {
         netMonthlyProfit,
         dailyChartData,
         expenseBreakdown,
-        pendingPurchases,
       },
     });
   } catch (error) {

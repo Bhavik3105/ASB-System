@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import Expense from '@/models/Expense';
-import Purchase from '@/models/Purchase';
 import Client from '@/models/Client';
 import Bank from '@/models/Bank';
 import Loan from '@/models/Loan';
@@ -93,31 +92,11 @@ export async function GET(request: NextRequest) {
         'Bank Name': b.bankName,
         'Account Holder': b.accountHolderName,
         'Account Number': b.accountNumber,
-        Mobile: b.mobileNumber,
-        'Purchase Amount': b.purchaseAmount,
       }));
       XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Banks');
     }
 
-    // ── PURCHASES ──────────────────────────────────────────────────
-    if (module === 'all' || module === 'purchases') {
-      const purchases = await Purchase.find(dateFilter)
-        .populate('clientId', 'personName')
-        .sort({ date: -1 })
-        .lean({ virtuals: true });
-      const data = purchases.map((p) => ({
-        Date: new Date(p.date).toLocaleDateString('en-IN'),
-        Title: p.title,
-        Type: p.type,
-        'Total Amount': p.totalAmount,
-        'Paid Amount': p.paidAmount,
-        'Pending Amount': p.totalAmount - p.paidAmount,
-        Status: p.status,
-        Client: (p.clientId as { personName?: string } | null)?.personName || '',
-        Notes: p.notes || '',
-      }));
-      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Purchases');
-    }
+
 
     // ── LOANS ──────────────────────────────────────────────────────
     if (module === 'all' || module === 'loans') {

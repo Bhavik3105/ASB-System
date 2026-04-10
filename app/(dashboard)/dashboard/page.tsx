@@ -13,7 +13,6 @@ export default function DashboardPage() {
     totalMonthlyCommission: 0,
     totalMonthlyExpenses: 0,
     netMonthlyProfit: 0,
-    pendingPurchases: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -110,43 +109,6 @@ export default function DashboardPage() {
           trend="Commission - Expenses"
         />
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 card">
-            <h3 className="text-lg font-bold mb-6 tracking-tight text-[var(--text-primary)]">Commission Over Time (30 Days)</h3>
-            <div className="h-72 flex flex-col items-center justify-center border-2 border-dashed rounded-[2rem] border-[var(--border)] bg-[var(--bg-primary)]">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 shadow-sm bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-secondary)]">
-                    <TrendingUp className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-bold uppercase tracking-widest text-[var(--text-secondary)]">Insights Engine Loading...</span>
-            </div>
-        </div>
-        <div className="card text-center">
-             <h3 className="text-lg font-bold mb-6 tracking-tight text-[var(--text-primary)]">Pending Purchases</h3>
-             <div className="flex flex-col items-center justify-center h-56">
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-lg bg-[var(--bg-primary)] border border-[var(--border)]">
-                       <ShoppingCart className="w-10 h-10 text-[var(--text-secondary)]" />
-                  </div>
-                  {data.pendingPurchases > 0 && (
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-rose-500 text-white text-[10px] font-bold rounded-full border-4 border-[var(--bg-card)] flex items-center justify-center">
-                      !
-                    </div>
-                  )}
-                </div>
-                <h4 className="text-4xl font-black tracking-tighter text-[var(--text-primary)]">{loading ? '-' : data.pendingPurchases}</h4>
-                <p className="text-xs font-bold mt-2 uppercase tracking-widest text-[var(--text-secondary)]">Requires attention</p>
-                
-                <button 
-                  onClick={() => window.location.href = '/purchases'}
-                  className="mt-6 text-xs font-bold underline underline-offset-4 transition-colors text-[var(--accent)] hover:text-white"
-                >
-                  View Details
-                </button>
-             </div>
-        </div>
-      </div>
     </div>
   );
 }
-

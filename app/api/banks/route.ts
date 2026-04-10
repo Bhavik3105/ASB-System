@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { bankName, accountHolderName, accountNumber, qrStatus, dailyLimit, notes } = body;
+    const { bankName, accountHolderName, accountNumber, qrStatus, dailyLimit } = body;
 
     if (!bankName || !accountHolderName || !accountNumber) {
       return NextResponse.json(
@@ -56,7 +56,6 @@ export async function POST(request: NextRequest) {
       bankName, accountHolderName, accountNumber,
       qrStatus,
       dailyLimit: Number(dailyLimit || 0),
-      notes,
       createdBy: session.userId,
     });
 

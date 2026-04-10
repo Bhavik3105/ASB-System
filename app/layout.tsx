@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: 'ASB System — Financial Management Platform',
-  description: 'Manage your business finances — commissions, expenses, clients, banks, and purchases in one place.',
+  description: 'Manage your business finances — commissions, expenses, clients, and banks in one place.',
   keywords: 'financial management, commission tracker, expense manager, business finance',
 };
 

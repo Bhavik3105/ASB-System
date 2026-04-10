@@ -35,12 +35,6 @@ export function getEndOfMonth(date: Date = new Date()): Date {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
 }
 
-export function getPurchaseStatus(paidAmount: number, totalAmount: number): string {
-  if (paidAmount <= 0) return 'Pending';
-  if (paidAmount >= totalAmount) return 'Paid';
-  return 'Partially Paid';
-}
-
 export function createApiResponse<T>(data: T, message?: string) {
   return { success: true, message, data };
 }

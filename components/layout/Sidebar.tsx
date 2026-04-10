@@ -12,7 +12,6 @@ const navItems = [
   { name: 'Banks', href: '/banks', icon: Landmark },
   { name: 'Bank Limits', href: '/bank-limits', icon: ArrowLeftRight },
   { name: 'Bank Purchase', href: '/clients', icon: Users },
-  { name: 'Purchases', href: '/purchases', icon: ShoppingCart },
   { name: 'Loans', href: '/loans', icon: Landmark },
   { name: 'Salary', href: '/salary', icon: TrendingUp },
   { name: 'Commissions', href: '/commissions', icon: TrendingUp },

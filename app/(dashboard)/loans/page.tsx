@@ -23,7 +23,7 @@ import RepaymentModal from '@/components/forms/RepaymentModal';
 
 export default function LoansPage() {
   const router = useRouter();
-  const [loans, setLoans] = useState([]);
+  const [loans, setLoans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
