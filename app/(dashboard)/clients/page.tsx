@@ -26,7 +26,7 @@ export default function ClientsPage() {
     try {
       setLoading(true);
       const q = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
-      const res = await fetch(`/api/clients${q}`);
+      const res = await fetch(`/api/clients${q}`, { cache: 'no-store' });
       const json = await res.json();
       if (json.success) setData(json.data);
     } catch {

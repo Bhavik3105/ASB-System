@@ -32,6 +32,10 @@ export async function GET(request: NextRequest) {
         success: true,
         data: clients,
         pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      }, {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        }
       });
     }
 
@@ -135,6 +139,10 @@ export async function GET(request: NextRequest) {
       success: true,
       data: mappedClients,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      }
     });
   } catch (error: any) {
     console.error('Clients API error:', error);
