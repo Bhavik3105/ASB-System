@@ -74,3 +74,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await connectDB();
+    await requireAuth();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Missing salary record ID' }, { status: 400 });
+    }
+
+    const deleted = await Salary.findByIdAndDelete(id);
+    if (!deleted) {
+      return NextResponse.json({ success: false, error: 'Salary record not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: deleted });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}

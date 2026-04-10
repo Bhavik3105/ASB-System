@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/tables/DataTable';
-import { Wallet, Plus, Pencil, Banknote, ArrowLeftRight, TrendingDown } from 'lucide-react';
+import { Wallet, Plus, Pencil, Banknote, ArrowLeftRight, TrendingDown, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '@/lib/utils';
 import EmployeeModal from '@/components/forms/EmployeeModal';
@@ -41,6 +41,25 @@ export default function SalaryPage() {
   const openSalModal = (emp: any) => {
     setSelectedEmp(emp);
     setIsSalModalOpen(true);
+  };
+
+  const handleDeleteSalary = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this salary record (advance/settlement) for this month?')) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/salaries?id=${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Salary record deleted');
+        fetchSalaries();
+      } else {
+        toast.error(json.error || 'Delete failed');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Calculations for summary cards
@@ -82,9 +101,20 @@ export default function SalaryPage() {
           <button onClick={() => openSalModal(row)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
             <Banknote className="w-3 h-3" /> Settle / Advance
           </button>
+          
           <button onClick={() => openEmpModal(row)} className="p-2 text-slate-500 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all border border-transparent hover:border-emerald-500/20">
             <Pencil className="w-4 h-4" />
           </button>
+
+          {row.salaryRecord?._id && (
+            <button 
+              onClick={() => handleDeleteSalary(row.salaryRecord._id)} 
+              className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all border border-transparent hover:border-rose-500/20"
+              title="Delete Salary Record"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
       )
     },
