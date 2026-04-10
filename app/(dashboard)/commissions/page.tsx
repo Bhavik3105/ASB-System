@@ -2,27 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/tables/DataTable';
-import { TrendingUp, Calendar, Plus, ArrowDownCircle, ArrowUpCircle, Pencil, Trash2 } from 'lucide-react';
+import { TrendingUp, Calendar, Plus, ArrowDownCircle, ArrowUpCircle, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import TransactionModal from '@/components/forms/TransactionModal';
+import DailyBreakdownModal from '@/components/forms/DailyBreakdownModal';
 
 export default function CommissionsPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<any>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  
   const [filters, setFilters] = useState({
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
 
-  const fetchCommissions = async () => {
+  const fetchDailyCommissions = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams(filters);
-      // Fetching individual transactions (could be filtered by commission > 0 if required)
-      const res = await fetch(`/api/transactions?${params}`);
+      const res = await fetch(`/api/commissions/daily?${params}`);
       const json = await res.json();
       if (json.success) setData(json.data);
     } catch {
@@ -33,91 +35,73 @@ export default function CommissionsPage() {
   };
 
   useEffect(() => {
-    fetchCommissions();
+    fetchDailyCommissions();
   }, [filters]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
-    try {
-      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
-      const json = await res.json();
-      if (json.success) {
-        toast.success('Record deleted');
-        fetchCommissions();
-      } else {
-        toast.error(json.error || 'Delete failed');
-      }
-    } catch {
-      toast.error('Network error');
-    }
-  };
-
-  const openModal = (transaction?: any) => {
-    setEditingTransaction(transaction || null);
-    setIsModalOpen(true);
+  const openBreakdown = (date: string) => {
+    setSelectedDate(date);
+    setIsBreakdownOpen(true);
   };
 
   const columns = [
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },
     { 
-      header: 'Deposit', 
+      header: 'Deposit Total', 
       accessor: (row: any) => (
         <span className="font-bold text-emerald-500">
-          {row.type === 'Deposit' ? formatCurrency(row.amount) : '-'}
+          {formatCurrency(row.deposits || 0)}
         </span>
       ) 
     },
     { 
-      header: 'Deposit Commission', 
+      header: 'Dep. Commission', 
       accessor: (row: any) => (
-        <span className="text-emerald-400 font-medium">
-          {row.type === 'Deposit' ? formatCurrency(row.commission) : '-'}
+        <span className="text-emerald-400 font-medium text-xs">
+          {formatCurrency(row.depositCommission || 0)}
         </span>
       ) 
     },
     { 
-      header: 'Withdrawal', 
+      header: 'Withdrawal Total', 
       accessor: (row: any) => (
         <span className="font-bold text-rose-500">
-          {row.type === 'Withdrawal' ? formatCurrency(row.amount) : '-'}
+          {formatCurrency(row.withdrawals || 0)}
         </span>
       ) 
     },
     { 
-      header: 'Withdrawal Commission', 
+      header: 'Wid. Commission', 
       accessor: (row: any) => (
-        <span className="text-rose-400 font-medium">
-          {row.type === 'Withdrawal' ? formatCurrency(row.commission) : '-'}
+        <span className="text-rose-400 font-medium text-xs">
+          {formatCurrency(row.withdrawalCommission || 0)}
         </span>
       ) 
     },
     { 
-      header: 'Total Commission', 
+      header: 'Daily Total', 
       accessor: (row: any) => (
-        <div className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-xl font-black border border-emerald-500/20 text-center shadow-sm">
-          {formatCurrency(row.commission)}
+        <div className="bg-emerald-500/10 text-emerald-500 px-3 py-1.5 rounded-xl font-black border border-emerald-500/20 text-center shadow-sm">
+          {formatCurrency(row.totalDailyCommission || 0)}
         </div>
       )
     },
-    { header: 'Reference', accessor: 'reference' },
     { 
       header: 'Actions', 
       accessor: (row: any) => (
-        <div className="flex gap-2">
-          <button onClick={() => openModal(row)} className="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors bg-slate-800/50 rounded-lg">
-            <Pencil className="w-4 h-4" />
-          </button>
-          <button onClick={() => handleDelete(row._id)} className="p-1.5 text-slate-400 hover:text-rose-400 transition-colors bg-slate-800/50 rounded-lg">
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+        <button 
+          onClick={() => openBreakdown(row.date)} 
+          className="flex items-center gap-1.5 py-1.5 px-3 text-xs font-bold text-slate-400 hover:text-emerald-400 transition-colors bg-slate-800/50 rounded-lg group"
+        >
+          <Settings className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" />
+          Manage
+        </button>
       )
     },
   ];
 
-  const totalDeposits = data.reduce((sum, row: any) => sum + (row.type === 'Deposit' ? row.amount : 0), 0);
-  const totalWithdrawals = data.reduce((sum, row: any) => sum + (row.type === 'Withdrawal' ? row.amount : 0), 0);
-  const totalCommission = data.reduce((sum, row: any) => sum + row.commission, 0);
+  const totalDeposits = data.reduce((sum, row: any) => sum + (row.deposits || 0), 0);
+  const totalWithdrawals = data.reduce((sum, row: any) => sum + (row.withdrawals || 0), 0);
+  const totalCommission = data.reduce((sum, row: any) => sum + (row.totalDailyCommission || 0), 0);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -127,8 +111,8 @@ export default function CommissionsPage() {
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">Commissions</h1>
-            <p className="text-[var(--text-secondary)] font-medium mt-0.5">Manage daily commission earnings and transaction records.</p>
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">Daily Commissions</h1>
+            <p className="text-[var(--text-secondary)] font-medium mt-0.5">Aggregated report of daily earnings and management ledger.</p>
           </div>
         </div>
         
@@ -153,7 +137,7 @@ export default function CommissionsPage() {
             </div>
           </div>
 
-          <button className="btn-primary" onClick={() => openModal()}>
+          <button className="btn-primary" onClick={() => setIsAddModalOpen(true)}>
             <Plus className="w-4 h-4" /> Add Commission
           </button>
         </div>
@@ -165,7 +149,7 @@ export default function CommissionsPage() {
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
               <ArrowDownCircle className="w-4 h-4" />
             </div>
-            Deposits
+            Total Deposits
           </div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">{formatCurrency(totalDeposits)}</h2>
         </div>
@@ -175,7 +159,7 @@ export default function CommissionsPage() {
             <div className="w-8 h-8 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
               <ArrowUpCircle className="w-4 h-4" />
             </div>
-            Withdrawals
+            Total Withdrawals
           </div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">{formatCurrency(totalWithdrawals)}</h2>
         </div>
@@ -185,7 +169,7 @@ export default function CommissionsPage() {
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
               <TrendingUp className="w-4 h-4" />
             </div>
-            Commission Earned
+            Total Commission Earned
           </div>
           <h2 className="text-2xl font-bold text-emerald-500 tracking-tight">{formatCurrency(totalCommission)}</h2>
         </div>
@@ -197,12 +181,21 @@ export default function CommissionsPage() {
         loading={loading} 
       />
 
+      {/* Main Add Modal - Dual Entry Mode */}
       <TransactionModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSuccess={fetchCommissions} 
-        initialData={editingTransaction}
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onSuccess={fetchDailyCommissions} 
         hideBankClient={true}
+        dualEntry={true}
+      />
+
+      {/* Breakdown Management Modal */}
+      <DailyBreakdownModal
+        isOpen={isBreakdownOpen}
+        onClose={() => setIsBreakdownOpen(false)}
+        date={selectedDate}
+        onSuccess={fetchDailyCommissions}
       />
     </div>
   );
