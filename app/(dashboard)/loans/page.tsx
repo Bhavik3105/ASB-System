@@ -62,6 +62,27 @@ export default function LoansPage() {
   const totalReceivable = stats.totalPrincipal + stats.totalInterest;
   const netDue = totalReceivable - stats.totalRepaid;
 
+  const handleDeleteLoan = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this loan? All linked repayment history will be lost. This cannot be undone.')) return;
+    
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/loans/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Loan deleted permanently');
+        fetchLoans();
+        router.refresh();
+      } else {
+        toast.error(data.error || 'Failed to delete loan');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header */}
@@ -226,8 +247,16 @@ export default function LoansPage() {
                     <button 
                       onClick={() => { setSelectedLoan(loan); setIsLoanModalOpen(true); }}
                       className="px-5 py-2.5 bg-slate-800/50 text-slate-300 rounded-2xl border border-slate-700 hover:bg-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition-all text-xs font-bold"
+                      title="Edit Loan Details"
                     >
                       Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteLoan(loan._id)}
+                      className="p-2.5 bg-rose-500/10 text-rose-500 rounded-2xl border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all group/del"
+                      title="Delete Loan Permanently"
+                    >
+                      <Trash2 className="w-4 h-4 group-hover/del:scale-110 transition-transform" />
                     </button>
                   </div>
                 </div>

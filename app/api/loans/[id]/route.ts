@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import connectDB from '@/lib/db';
 import Loan from '@/models/Loan';
+import LoanRepayment from '@/models/LoanRepayment';
 import { getSession } from '@/lib/auth';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -38,6 +39,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!session) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
 
     const { id } = await params;
+    
+    // First, delete all linked repayments
+    await LoanRepayment.deleteMany({ loanId: id });
+    
+    // Then delete the loan
     const deleted = await Loan.findOneAndDelete({ _id: id, createdBy: session.userId });
 
     if (!deleted) return NextResponse.json({ success: false, error: 'Loan not found' }, { status: 404 });
