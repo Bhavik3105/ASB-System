@@ -18,7 +18,6 @@ export default function SalaryModal({ isOpen, onClose, onSuccess, employeeData, 
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     advanceAmount: 0,
-    bonusAmount: 0,
     isPaid: false,
     notes: '',
   });
@@ -27,7 +26,6 @@ export default function SalaryModal({ isOpen, onClose, onSuccess, employeeData, 
     if (isOpen && employeeData?.salaryRecord) {
       setForm({
         advanceAmount: employeeData.salaryRecord.advanceAmount || 0,
-        bonusAmount: employeeData.salaryRecord.bonusAmount || 0,
         isPaid: employeeData.salaryRecord.isPaid || false,
         notes: employeeData.salaryRecord.notes || '',
       });
@@ -37,7 +35,7 @@ export default function SalaryModal({ isOpen, onClose, onSuccess, employeeData, 
   if (!isOpen) return null;
 
   const baseSalary = employeeData.baseSalary || 0;
-  const netPayable = baseSalary + Number(form.bonusAmount) - Number(form.advanceAmount);
+  const netPayable = baseSalary - Number(form.advanceAmount);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,37 +86,31 @@ export default function SalaryModal({ isOpen, onClose, onSuccess, employeeData, 
           <div className="modal-body space-y-6">
             {/* Salary Breakdown Summary */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                <p className="text-xs text-slate-400 mb-1">Base Salary</p>
-                <p className="text-lg font-bold text-[var(--text-primary)]">{formatCurrency(baseSalary)}</p>
+              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+                <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-bold">Base Salary</p>
+                <p className="text-xl font-bold text-[var(--text-primary)]">{formatCurrency(baseSalary)}</p>
               </div>
-              <div className={`p-4 rounded-xl border ${form.isPaid ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-cyan-500/10 border-cyan-500/20'}`}>
-                <p className="text-xs text-slate-400 mb-1">Net Payable</p>
-                <p className={`text-lg font-bold ${netPayable < 0 ? 'text-red-400' : 'text-cyan-400'}`}>
+              <div className={`p-4 rounded-xl border ${form.isPaid ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20'}`}>
+                <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider font-bold">Net Payable</p>
+                <p className={`text-xl font-black ${netPayable < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                   {formatCurrency(netPayable)}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">Monthly Advance (Deduction)</label>
+            <div>
+              <label className="label">Monthly Advance (Deduction)</label>
+              <div className="relative">
                 <input
                   type="number"
-                  className="input text-red-400 focus:border-red-500/50"
+                  className="input text-rose-400 focus:border-rose-500/50 pl-10"
+                  placeholder="0.00"
                   value={form.advanceAmount}
                   onChange={(e) => setForm({ ...form, advanceAmount: parseFloat(e.target.value) || 0 })}
                 />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-rose-500 font-bold">-</div>
               </div>
-              <div>
-                <label className="label">Bonus / Additions</label>
-                <input
-                  type="number"
-                  className="input text-emerald-400 focus:border-emerald-500/50"
-                  value={form.bonusAmount}
-                  onChange={(e) => setForm({ ...form, bonusAmount: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
+              <p className="text-[10px] text-slate-500 mt-1.5 italic">This amount will be subtracted from the base salary at settlement.</p>
             </div>
 
             <div>
