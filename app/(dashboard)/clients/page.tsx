@@ -65,7 +65,6 @@ export default function ClientsPage() {
     { header: 'Mobile', accessor: 'mobileNumber' },
     { header: 'Bank Type', accessor: (row: any) => row.bankType || '-' },
     { header: 'Reference', accessor: (row: any) => row.reference || '-' },
-    { header: 'Price', accessor: (row: any) => formatCurrency(row.price) },
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },
     { header: 'Deposit Amt', accessor: (row: any) => formatCurrency(row.depositAmount) },
     { header: 'Status', accessor: (row: any) => (

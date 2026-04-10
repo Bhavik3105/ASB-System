@@ -58,7 +58,6 @@ export async function GET(request: NextRequest) {
     if (search) {
       pipeline.push({
         $addFields: {
-          priceString: { $toString: { $ifNull: ['$price', 0] } },
           dateString: { 
             $cond: [
               { $gt: ['$date', null] },
@@ -89,7 +88,6 @@ export async function GET(request: NextRequest) {
             { mobileNumber: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
             { reference: { $regex: search, $options: 'i' } },
-            { priceString: { $regex: search, $options: 'i' } },
             { dateString: { $regex: search, $options: 'i' } },
             { bankNames: { $regex: search, $options: 'i' } }
           ]
@@ -115,7 +113,6 @@ export async function GET(request: NextRequest) {
           { $limit: limit },
           {
             $project: {
-              priceString: 0,
               dateString: 0,
               bankNames: 0,
               bankDetailsLookup: 0,
@@ -155,7 +152,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { personName, banks, mobileNumber, email, bankType, reference, price, depositAmount, businessType, date, totalAmount } = body;
+    const { personName, banks, mobileNumber, email, bankType, reference, depositAmount, businessType, date, totalAmount } = body;
 
     if (!personName || !mobileNumber || !date) {
       return NextResponse.json({ success: false, error: 'personName, mobileNumber, date are required' }, { status: 400 });
@@ -163,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     const client = await Client.create({
       personName, banks: banks || [], mobileNumber, email, bankType,
-      reference, price: Number(price || 0), depositAmount: Number(depositAmount || 0), businessType,
+      reference, depositAmount: Number(depositAmount || 0), businessType,
       date: new Date(date), totalAmount: Number(totalAmount || 0),
       createdBy: session.userId,
     });

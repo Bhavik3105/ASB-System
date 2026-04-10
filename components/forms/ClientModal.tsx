@@ -21,7 +21,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     reference: '',
     depositAmount: '',
     businessType: '',
-    price: '',
     date: new Date().toISOString().split('T')[0],
   };
   const [form, setForm] = useState(defaultForm);
@@ -54,7 +53,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          price: form.price ? parseFloat(form.price as string) : 0,
           depositAmount: form.depositAmount ? parseFloat(form.depositAmount as string) : 0,
         }),
       });
@@ -167,18 +165,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">Price</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  className="input"
-                  placeholder="Enter Price"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                />
-              </div>
               <div>
                 <label className="label">Date</label>
                 <input

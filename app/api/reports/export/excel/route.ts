@@ -80,7 +80,6 @@ export async function GET(request: NextRequest) {
         'Bank Type': c.bankType || '',
         Reference: c.reference || '',
         Date: new Date(c.date).toLocaleDateString('en-IN'),
-        Price: c.price,
         'Deposit Amount': c.depositAmount,
         'Total Amount': c.totalAmount,
         'Business Type': c.businessType || '',
