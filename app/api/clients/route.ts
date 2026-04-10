@@ -5,6 +5,8 @@ import Client from '@/models/Client';
 import Bank from '@/models/Bank'; 
 import { requireAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();

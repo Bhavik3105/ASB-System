@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     const clientsPromise = Client.aggregate([
       {
         $addFields: {
-          amountString: { $toString: '$depositAmount' },
-          dateString: { $dateToString: { format: '%Y-%m-%d', date: '$openDate' } }
+          priceString: { $toString: { $ifNull: ['$price', 0] } },
+          dateString: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }
         }
       },
       {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
             { mobileNumber: regex },
             { email: regex },
             { reference: regex },
-            { amountString: regex },
+            { priceString: regex },
             { dateString: regex }
           ]
         }
