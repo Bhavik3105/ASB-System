@@ -17,6 +17,8 @@ export default function ClientsPage() {
   const [search, setSearch] = useState(initialSearch);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
+
 
   useEffect(() => {
     setSearch(searchParams.get('search') || '');
@@ -25,18 +27,34 @@ export default function ClientsPage() {
   const fetchClients = async (searchTerm = '') => {
     try {
       setLoading(true);
-      const q = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
-      const res = await fetch(`/api/clients${q}`, { cache: 'no-store' });
+      const q = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
+      // Aggressive cache busting with timestamp
+      const res = await fetch(`/api/clients?t=${Date.now()}${q}`, { 
+        cache: 'no-store',
+        headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' }
+      });
       const json = await res.json();
-      if (json.success) setData(json.data);
-    } catch {
+      console.log('API Response Debug:', { 
+        success: json.success, 
+        count: json.data?.length, 
+        debug: json._debug,
+        timestamp: new Date().toLocaleTimeString()
+      });
+      if (json.success) {
+        setData(json.data);
+        setDebugInfo(json._debug);
+      }
+    } catch (err) {
+      console.error('Fetch Clients Error:', err);
       toast.error('Failed to load records');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchClients(search); }, [search]);
+  useEffect(() => { 
+    fetchClients(search); 
+  }, [search]);
   
   // (Leaving the rest of the logic as is...)
   const handleDelete = async (id: string) => {
@@ -95,6 +113,19 @@ export default function ClientsPage() {
            <Plus className="w-4 h-4" /> Add Record
          </button>
       </div>
+      
+      {debugInfo && Boolean(debugInfo.rawCount > 0 && data.length === 0) && (
+         <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3 text-amber-500">
+           <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+             <Landmark className="w-5 h-5" />
+           </div>
+           <div>
+             <p className="font-bold text-sm uppercase tracking-wider">Sync Warning</p>
+             <p className="text-xs opacity-80">The system found {debugInfo.rawCount} records in the database, but your browser is showing none. This usually means a cache refresh is needed.</p>
+           </div>
+           <button onClick={() => fetchClients(search)} className="ml-auto text-xs font-bold underline px-4">Force Reload</button>
+         </div>
+      )}
       
       <DataTable
         columns={columns}
