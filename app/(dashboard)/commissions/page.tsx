@@ -60,20 +60,44 @@ export default function CommissionsPage() {
   const columns = [
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },
     { 
-      header: 'Type', 
+      header: 'Deposit', 
       accessor: (row: any) => (
-        <span className={row.type === 'Deposit' ? 'text-emerald-500 font-bold' : 'text-rose-500 font-bold'}>
-          {row.type}
+        <span className="font-bold text-emerald-500">
+          {row.type === 'Deposit' ? formatCurrency(row.amount) : '-'}
         </span>
       ) 
     },
     { 
-      header: 'Amount', 
-      accessor: (row: any) => <span>{formatCurrency(row.amount)}</span> 
+      header: 'Deposit Commission', 
+      accessor: (row: any) => (
+        <span className="text-emerald-400 font-medium">
+          {row.type === 'Deposit' ? formatCurrency(row.commission) : '-'}
+        </span>
+      ) 
     },
     { 
-      header: 'Commission', 
-      accessor: (row: any) => <span className="text-emerald-400 font-black">{formatCurrency(row.commission)}</span> 
+      header: 'Withdrawal', 
+      accessor: (row: any) => (
+        <span className="font-bold text-rose-500">
+          {row.type === 'Withdrawal' ? formatCurrency(row.amount) : '-'}
+        </span>
+      ) 
+    },
+    { 
+      header: 'Withdrawal Commission', 
+      accessor: (row: any) => (
+        <span className="text-rose-400 font-medium">
+          {row.type === 'Withdrawal' ? formatCurrency(row.commission) : '-'}
+        </span>
+      ) 
+    },
+    { 
+      header: 'Total Commission', 
+      accessor: (row: any) => (
+        <div className="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-xl font-black border border-emerald-500/20 text-center shadow-sm">
+          {formatCurrency(row.commission)}
+        </div>
+      )
     },
     { header: 'Reference', accessor: 'reference' },
     { 
