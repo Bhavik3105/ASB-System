@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DataTable from '@/components/tables/DataTable';
-import { Users, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Users, Plus, Pencil, Trash2, Landmark } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import ClientModal from '@/components/forms/ClientModal';
