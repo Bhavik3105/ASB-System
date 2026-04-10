@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const session = await requireAuth();
     const body = await request.json();
 
-    const { title, amount, type, date, notes } = body;
+    const { title, amount, type, date } = body;
     if (!title || amount == null || !type || !date) {
       return NextResponse.json({ success: false, error: 'title, amount, type, date are required' }, { status: 400 });
     }
@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
       amount: Number(amount),
       type,
       date: new Date(date),
-      notes,
       createdBy: session.userId,
     });
 

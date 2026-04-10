@@ -18,7 +18,6 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, initialData }
     amount: '',
     type: 'Home' as 'Home' | 'Business',
     date: new Date().toISOString().split('T')[0],
-    notes: '',
   };
   const [form, setForm] = useState(defaultForm);
 
@@ -128,15 +127,6 @@ export default function ExpenseModal({ isOpen, onClose, onSuccess, initialData }
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
                 required
-              />
-            </div>
-
-            <div>
-              <label className="label">Notes (Optional)</label>
-              <textarea
-                className="input min-h-[80px] resize-none"
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
               />
             </div>
           </div>

@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
         Title: e.title,
         Type: e.type,
         Amount: e.amount,
-        Notes: e.notes || '',
       }));
       XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Expenses');
     }

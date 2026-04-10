@@ -55,8 +55,7 @@ export default function ExpensesPage() {
     { header: 'Type', accessor: (row: any) => (
        <span className={row.type === 'Business' ? 'badge-info' : 'badge-warning'}>{row.type}</span>
     )},
-    { header: 'Amount', accessor: (row: any) => <span className="font-bold text-slate-800">{formatCurrency(row.amount)}</span> },
-    { header: 'Notes', accessor: 'notes', className: 'truncate max-w-[200px]' },
+    { header: 'Amount', accessor: (row: any) => <span className="font-bold text-slate-200">{formatCurrency(row.amount)}</span> },
     { header: 'Actions', accessor: (row: any) => (
        <div className="flex gap-2">
          <button onClick={() => openModal(row)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
