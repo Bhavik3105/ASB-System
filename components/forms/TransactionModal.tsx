@@ -103,14 +103,20 @@ export default function TransactionModal({ isOpen, onClose, onSuccess, initialDa
       const url = initialData ? `/api/transactions/${initialData._id}` : '/api/transactions';
       const method = initialData ? 'PUT' : 'POST';
 
+      const payload: any = {
+        ...form,
+        amount: parseFloat(form.amount as string),
+        commission: parseFloat(form.commission as string),
+      };
+
+      // Remove empty strings for IDs to prevent Mongoose cast errors
+      if (!payload.clientId) delete payload.clientId;
+      if (!payload.bankId) delete payload.bankId;
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          amount: parseFloat(form.amount as string),
-          commission: parseFloat(form.commission as string),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
