@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DataTable from '@/components/tables/DataTable';
-import { TrendingUp, Calendar, Plus, ArrowDownCircle, ArrowUpCircle, Settings } from 'lucide-react';
+import { TrendingUp, Calendar, Plus, ArrowDownCircle, ArrowUpCircle, Settings, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import TransactionModal from '@/components/forms/TransactionModal';
@@ -43,6 +43,26 @@ export default function CommissionsPage() {
   const openBreakdown = (date: string) => {
     setSelectedDate(date);
     setIsBreakdownOpen(true);
+  };
+
+  const handleDeleteDay = async (date: string) => {
+    if (!confirm(`Are you sure you want to delete ALL transactions for ${formatDate(date)}? This cannot be undone.`)) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/commissions/bulk-delete?date=${date}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(`Deleted ${json.deletedCount} entries for ${formatDate(date)}`);
+        fetchDailyCommissions();
+        router.refresh();
+      } else {
+        toast.error(json.error || 'Failed to delete data');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -90,13 +110,23 @@ export default function CommissionsPage() {
     { 
       header: 'Actions', 
       accessor: (row: any) => (
-        <button 
-          onClick={() => openBreakdown(row.date)} 
-          className="flex items-center gap-1.5 py-1.5 px-3 text-xs font-bold text-slate-400 hover:text-emerald-400 transition-colors bg-slate-800/50 rounded-lg group"
-        >
-          <Settings className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" />
-          Manage
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => openBreakdown(row.date)} 
+            className="flex items-center gap-1.5 py-1.5 px-3 text-xs font-bold text-slate-400 hover:text-emerald-400 transition-colors bg-slate-800/50 rounded-lg group"
+          >
+            <Settings className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" />
+            Manage
+          </button>
+          
+          <button 
+            onClick={() => handleDeleteDay(row.date)} 
+            className="p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all border border-transparent hover:border-rose-500/20"
+            title="Delete Entire Day's Transactions"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       )
     },
   ];

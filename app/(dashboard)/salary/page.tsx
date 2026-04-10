@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DataTable from '@/components/tables/DataTable';
-import { Wallet, Plus, Pencil, Banknote, ArrowLeftRight, TrendingDown, Trash2 } from 'lucide-react';
+import { Wallet, Plus, Pencil, Banknote, ArrowLeftRight, TrendingDown, Trash2, UserMinus } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 import EmployeeModal from '@/components/forms/EmployeeModal';
 import SalaryModal from '@/components/forms/SalaryModal';
 
@@ -65,6 +65,26 @@ export default function SalaryPage() {
     }
   };
 
+  const handleDeleteEmployee = async (id: string) => {
+    if (!confirm('CAUTION: This will permanently delete the employee record and all related history. Are you sure?')) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/employees/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.success) {
+        toast.success('Employee deleted successfully');
+        fetchSalaries();
+        router.refresh();
+      } else {
+        toast.error(json.error || 'Failed to delete employee');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Calculations for summary cards
   const totalBase = data.reduce((acc, curr: any) => acc + (curr.baseSalary || 0), 0);
   const totalAdvance = data.reduce((acc, curr: any) => acc + (curr.salaryRecord?.advanceAmount || 0), 0);
@@ -75,6 +95,10 @@ export default function SalaryPage() {
     {
       header: 'Base Salary',
       accessor: (row: any) => <span className="font-bold text-slate-400">{formatCurrency(row.baseSalary)}</span>
+    },
+    {
+      header: 'Joining Date',
+      accessor: (row: any) => <span className="text-xs text-slate-500">{row.joiningDate ? formatDate(row.joiningDate) : '-'}</span>
     },
     {
       header: 'Advance Taken',
@@ -105,8 +129,12 @@ export default function SalaryPage() {
             <Banknote className="w-3 h-3" /> Settle / Advance
           </button>
           
-          <button onClick={() => openEmpModal(row)} className="p-2 text-slate-500 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all border border-transparent hover:border-emerald-500/20">
+          <button onClick={() => openEmpModal(row)} className="p-2 text-slate-500 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all border border-transparent hover:border-emerald-500/20" title="Edit Employee">
             <Pencil className="w-4 h-4" />
+          </button>
+
+          <button onClick={() => handleDeleteEmployee(row._id)} className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-all border border-transparent hover:border-rose-500/20" title="Delete Employee Entirely">
+            <UserMinus className="w-4 h-4" />
           </button>
 
           {row.salaryRecord?._id && (
@@ -174,7 +202,7 @@ export default function SalaryPage() {
             <div className="w-8 h-8 rounded-xl bg-slate-500/10 flex items-center justify-center text-slate-400">
               <Banknote className="w-4 h-4" />
             </div>
-            Base Salary Pool
+            Monthly Base Total
           </div>
           <h3 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">{formatCurrency(totalBase)}</h3>
         </div>
