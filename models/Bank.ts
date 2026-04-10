@@ -4,10 +4,7 @@ export interface IBank extends Document {
   bankName: string;
   accountHolderName: string;
   accountNumber: string;
-  mobileNumber: string;
   qrStatus?: string;
-  kitStatus?: string;
-  emailId?: string;
   dailyLimit: number;
   isActive: boolean;
   notes?: string;
@@ -21,10 +18,7 @@ const BankSchema = new Schema<IBank>(
     bankName: { type: String, required: true, trim: true },
     accountHolderName: { type: String, required: true, trim: true },
     accountNumber: { type: String, required: true, trim: true },
-    mobileNumber: { type: String, required: true, trim: true },
-    qrStatus: { type: String, default: 'Pending', trim: true },
-    kitStatus: { type: String, default: 'Pending', trim: true },
-    emailId: { type: String, trim: true },
+    qrStatus: { type: String, default: 'Active', trim: true },
     dailyLimit: { type: Number, default: 0, min: 0 },
     isActive: { type: Boolean, default: true },
     notes: { type: String, trim: true },

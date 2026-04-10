@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import connectDB from '@/lib/db';
 import Bank from '@/models/Bank';
 import { requireAuth } from '@/lib/auth';
@@ -18,7 +19,6 @@ export async function GET(request: NextRequest) {
         { bankName: { $regex: search, $options: 'i' } },
         { accountHolderName: { $regex: search, $options: 'i' } },
         { accountNumber: { $regex: search, $options: 'i' } },
-        { emailId: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -43,18 +43,18 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { bankName, accountHolderName, accountNumber, mobileNumber, qrStatus, kitStatus, emailId, dailyLimit, notes } = body;
+    const { bankName, accountHolderName, accountNumber, qrStatus, dailyLimit, notes } = body;
 
-    if (!bankName || !accountHolderName || !accountNumber || !mobileNumber) {
+    if (!bankName || !accountHolderName || !accountNumber) {
       return NextResponse.json(
-        { success: false, error: 'bankName, accountHolderName, accountNumber, mobileNumber are required' },
+        { success: false, error: 'bankName, accountHolderName, accountNumber are required' },
         { status: 400 }
       );
     }
 
     const bank = await Bank.create({
-      bankName, accountHolderName, accountNumber, mobileNumber,
-      qrStatus, kitStatus, emailId,
+      bankName, accountHolderName, accountNumber,
+      qrStatus,
       dailyLimit: Number(dailyLimit || 0),
       notes,
       createdBy: session.userId,

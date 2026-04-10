@@ -17,10 +17,7 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
     bankName: '',
     accountHolderName: '',
     accountNumber: '',
-    mobileNumber: '',
-    qrStatus: 'Pending',
-    kitStatus: 'Pending',
-    emailId: '',
+    qrStatus: 'Active',
     dailyLimit: 0,
     notes: '',
   };
@@ -33,10 +30,7 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
           bankName: initialData.bankName || '',
           accountHolderName: initialData.accountHolderName || '',
           accountNumber: initialData.accountNumber || '',
-          mobileNumber: initialData.mobileNumber || '',
-          qrStatus: initialData.qrStatus || 'Pending',
-          kitStatus: initialData.kitStatus || 'Pending',
-          emailId: initialData.emailId || '',
+          qrStatus: initialData.qrStatus || 'Active',
           dailyLimit: initialData.dailyLimit || 0,
           notes: initialData.notes || '',
         });
@@ -116,57 +110,35 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
                 <label className="label">Account Number</label>
                 <input
                   type="text"
-                  className="input"
+                  className="input !bg-slate-900/30"
                   value={form.accountNumber}
                   onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
                   required
                 />
               </div>
               <div>
-                <label className="label">Mobile Number</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={form.mobileNumber}
-                  onChange={(e) => setForm({ ...form, mobileNumber: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
                 <label className="label">QR Status</label>
                 <select
-                  className="select"
+                  className="select !bg-slate-900/30"
                   value={form.qrStatus}
                   onChange={(e) => setForm({ ...form, qrStatus: e.target.value })}
                 >
-                  <option value="Pending">Pending</option>
-                  <option value="Done">Done</option>
+                  <option value="Active">Active</option>
+                  <option value="Freeze">Freeze</option>
+                  <option value="KYC">KYC</option>
                 </select>
               </div>
-              <div>
-                <label className="label">KIT Status</label>
-                <select
-                  className="select"
-                  value={form.kitStatus}
-                  onChange={(e) => setForm({ ...form, kitStatus: e.target.value })}
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Received">Received</option>
-                </select>
-              </div>
-              <div>
-                <label className="label">Email ID</label>
-                <input
-                  type="email"
-                  className="input"
-                  placeholder="bank@example.com"
-                  value={form.emailId}
-                  onChange={(e) => setForm({ ...form, emailId: e.target.value })}
-                />
-              </div>
+            </div>
+
+            <div>
+              <label className="label">Daily Limit (₹)</label>
+              <input
+                type="number"
+                className="input !bg-slate-900/30"
+                placeholder="500000"
+                value={form.dailyLimit}
+                onChange={(e) => setForm({ ...form, dailyLimit: parseFloat(e.target.value) || 0 })}
+              />
             </div>
 
             <div>
@@ -183,7 +155,7 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
             <div>
               <label className="label">Notes (Optional)</label>
               <textarea
-                className="input min-h-[80px] resize-none"
+                className="input min-h-[80px] resize-none !bg-slate-900/30"
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
               />
