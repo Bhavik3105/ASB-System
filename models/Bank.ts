@@ -7,7 +7,6 @@ export interface IBank extends Document {
   qrStatus?: string;
   dailyLimit: number;
   isActive: boolean;
-  notes?: string;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -21,7 +20,6 @@ const BankSchema = new Schema<IBank>(
     qrStatus: { type: String, default: 'Active', trim: true },
     dailyLimit: { type: Number, default: 0, min: 0 },
     isActive: { type: Boolean, default: true },
-    notes: { type: String, trim: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }

@@ -58,6 +58,7 @@ export default function BanksPage() {
     { header: 'Bank Name', accessor: 'bankName' },
     { header: 'Holder', accessor: 'accountHolderName' },
     { header: 'A/C Number', accessor: (row: any) => <span className="font-mono text-slate-400">{row.accountNumber}</span> },
+    { header: 'Daily Limit', accessor: (row: any) => <span className="font-bold text-emerald-500">{formatCurrency(row.dailyLimit)}</span> },
     { 
       header: 'QR Status', 
       accessor: (row: any) => (

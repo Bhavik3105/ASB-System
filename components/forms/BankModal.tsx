@@ -19,7 +19,6 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
     accountNumber: '',
     qrStatus: 'Active',
     dailyLimit: 0,
-    notes: '',
   };
   const [form, setForm] = useState(defaultForm);
 
@@ -32,7 +31,6 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
           accountNumber: initialData.accountNumber || '',
           qrStatus: initialData.qrStatus || 'Active',
           dailyLimit: initialData.dailyLimit || 0,
-          notes: initialData.notes || '',
         });
       } else {
         setForm(defaultForm);
@@ -152,13 +150,6 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
               />
             </div>
 
-            <div>
-              <label className="label">Notes (Optional)</label>
-              <textarea
-                className="input min-h-[80px] resize-none !bg-slate-900/30"
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              />
             </div>
           </div>
 
