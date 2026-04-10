@@ -6,10 +6,10 @@ export interface IClient extends Document {
   email?: string;
   bankType?: string;
   reference?: string;
-  documents?: string;
+  price: number;
   depositAmount: number;
   businessType?: string;
-  openDate: Date;
+  date: Date;
   totalAmount: number;
   isActive: boolean;
   createdBy: mongoose.Types.ObjectId;
@@ -24,10 +24,10 @@ const ClientSchema = new Schema<IClient>(
     email: { type: String, trim: true, lowercase: true },
     bankType: { type: String, trim: true },
     reference: { type: String, trim: true },
-    documents: { type: String, trim: true },
+    price: { type: Number, default: 0, min: 0 },
     depositAmount: { type: Number, default: 0, min: 0 },
     businessType: { type: String, trim: true },
-    openDate: { type: Date, required: true },
+    date: { type: Date, required: true },
     totalAmount: { type: Number, default: 0, min: 0 },
     isActive: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },

@@ -21,8 +21,8 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     reference: '',
     depositAmount: '',
     businessType: '',
-    documents: '',
-    openDate: new Date().toISOString().split('T')[0],
+    price: '',
+    date: new Date().toISOString().split('T')[0],
   };
   const [form, setForm] = useState(defaultForm);
 
@@ -31,7 +31,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
       if (initialData) {
         setForm({
           ...initialData,
-          openDate: initialData.openDate ? new Date(initialData.openDate).toISOString().split('T')[0] : defaultForm.openDate,
+          date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : defaultForm.date,
         });
       } else {
         setForm(defaultForm);
@@ -54,6 +54,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          price: form.price ? parseFloat(form.price as string) : 0,
           depositAmount: form.depositAmount ? parseFloat(form.depositAmount as string) : 0,
         }),
       });
@@ -167,22 +168,24 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="label">Documents</label>
+                <label className="label">Price</label>
                 <input
-                  type="text"
+                  type="number"
+                  step="0.01"
+                  min="0"
                   className="input"
-                  placeholder="Msme, Ghumasta, etc."
-                  value={form.documents}
-                  onChange={(e) => setForm({ ...form, documents: e.target.value })}
+                  placeholder="Enter Price"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
                 />
               </div>
               <div>
-                <label className="label">Open Date</label>
+                <label className="label">Date</label>
                 <input
                   type="date"
                   className="input"
-                  value={form.openDate}
-                  onChange={(e) => setForm({ ...form, openDate: e.target.value })}
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
                   required
                 />
               </div>

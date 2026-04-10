@@ -52,11 +52,11 @@ export async function GET(request: NextRequest) {
     if (search) {
       pipeline.push({
         $addFields: {
-          amountString: { $toString: { $ifNull: ['$depositAmount', 0] } },
+          priceString: { $toString: { $ifNull: ['$price', 0] } },
           dateString: { 
             $cond: [
-              { $gt: ['$openDate', null] },
-              { $dateToString: { format: '%Y-%m-%d', date: '$openDate' } },
+              { $gt: ['$date', null] },
+              { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
               ''
             ]
           },
@@ -145,16 +145,16 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { personName, banks, mobileNumber, email, bankType, reference, documents, depositAmount, businessType, openDate, totalAmount } = body;
+    const { personName, banks, mobileNumber, email, bankType, reference, price, depositAmount, businessType, date, totalAmount } = body;
 
-    if (!personName || !mobileNumber || !openDate) {
-      return NextResponse.json({ success: false, error: 'personName, mobileNumber, openDate are required' }, { status: 400 });
+    if (!personName || !mobileNumber || !date) {
+      return NextResponse.json({ success: false, error: 'personName, mobileNumber, date are required' }, { status: 400 });
     }
 
     const client = await Client.create({
       personName, banks: banks || [], mobileNumber, email, bankType,
-      reference, documents, depositAmount: Number(depositAmount || 0), businessType,
-      openDate: new Date(openDate), totalAmount: Number(totalAmount || 0),
+      reference, price: Number(price || 0), depositAmount: Number(depositAmount || 0), businessType,
+      date: new Date(date), totalAmount: Number(totalAmount || 0),
       createdBy: session.userId,
     });
 
