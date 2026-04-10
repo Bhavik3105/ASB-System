@@ -91,7 +91,7 @@ export default function RepaymentModal({ isOpen, onClose, onSuccess, loan }: Rep
               <input
                 type="number"
                 step="any"
-                className="input pl-10"
+                className="input pl-10 !bg-slate-900/30"
                 placeholder="0.00"
                 value={form.amount}
                 onChange={(e) => setForm({ ...form, amount: e.target.value })}
@@ -124,7 +124,7 @@ export default function RepaymentModal({ isOpen, onClose, onSuccess, loan }: Rep
             <label className="label">Payment Date</label>
             <input
               type="date"
-              className="input"
+              className="input !bg-slate-900/30"
               value={form.paymentDate}
               onChange={(e) => setForm({ ...form, paymentDate: e.target.value })}
               required
@@ -135,7 +135,7 @@ export default function RepaymentModal({ isOpen, onClose, onSuccess, loan }: Rep
             <label className="label">Notes (Optional)</label>
             <input
               type="text"
-              className="input"
+              className="input !bg-slate-900/30"
               placeholder="Installment #, Cash, Bank, etc."
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}

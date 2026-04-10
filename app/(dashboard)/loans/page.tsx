@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Landmark, 
   Plus, 
@@ -13,13 +14,15 @@ import {
   ChevronRight,
   TrendingDown,
   Clock,
-  Loader2
+  Loader2,
+  Trash2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LoanModal from '@/components/forms/LoanModal';
 import RepaymentModal from '@/components/forms/RepaymentModal';
 
 export default function LoansPage() {
+  const router = useRouter();
   const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -29,7 +32,7 @@ export default function LoansPage() {
 
   const fetchLoans = async () => {
     try {
-      const res = await fetch('/api/loans');
+      const res = await fetch('/api/loans', { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setLoans(data.data);
@@ -64,8 +67,8 @@ export default function LoansPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Loan Management</h1>
-          <p className="text-slate-500 mt-1">Track lending, interest, and incoming repayments.</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">Loan Management</h1>
+          <p className="text-[var(--text-secondary)] mt-1 font-medium">Track lending, interest, and incoming repayments.</p>
         </div>
         <button 
           onClick={() => { setSelectedLoan(null); setIsLoanModalOpen(true); }}
@@ -79,54 +82,54 @@ export default function LoansPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="stat-card">
-          <div className="flex items-center gap-3 text-slate-500 text-sm mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-600 shadow-sm shadow-sky-500/5">
+          <div className="flex items-center gap-3 text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest mb-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-500 shadow-sm">
               <Landmark className="w-5 h-5" />
             </div>
             Total Out (Principal)
           </div>
-          <div className="text-2xl font-bold text-slate-800">₹{stats.totalPrincipal.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">₹{stats.totalPrincipal.toLocaleString()}</div>
         </div>
 
         <div className="stat-card">
-          <div className="flex items-center gap-3 text-slate-500 text-sm mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-sm shadow-emerald-500/5">
+          <div className="flex items-center gap-3 text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest mb-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-sm">
               <TrendingDown className="w-5 h-5" />
             </div>
             Interest Earned
           </div>
-          <div className="text-2xl font-bold text-emerald-600">+₹{stats.totalInterest.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-emerald-500 tracking-tight">+₹{stats.totalInterest.toLocaleString()}</div>
         </div>
 
         <div className="stat-card">
-          <div className="flex items-center gap-3 text-slate-500 text-sm mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm shadow-indigo-500/5">
+          <div className="flex items-center gap-3 text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest mb-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shadow-sm">
               <ArrowDownLeft className="w-5 h-5" />
             </div>
             Total Recovered
           </div>
-          <div className="text-2xl font-bold text-indigo-600">₹{stats.totalRepaid.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-indigo-500 tracking-tight">₹{stats.totalRepaid.toLocaleString()}</div>
         </div>
 
-        <div className="stat-card">
-          <div className="flex items-center gap-3 text-slate-500 text-sm mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm shadow-amber-500/5">
+        <div className="stat-card border-b-4 border-b-amber-500/50">
+          <div className="flex items-center gap-3 text-[var(--text-secondary)] text-xs font-bold uppercase tracking-widest mb-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-sm">
               <Clock className="w-5 h-5" />
             </div>
             Net Outstanding
           </div>
-          <div className="text-2xl font-bold text-amber-600">₹{netDue.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-amber-500 tracking-tight">₹{netDue.toLocaleString()}</div>
         </div>
       </div>
 
       {/* Filters & Search */}
-      <div className="card !p-4">
+      <div className="card !p-4 bg-[var(--bg-secondary)] border-[var(--border)]">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
           <input 
             type="text"
             placeholder="Search borrower name..."
-            className="input !bg-slate-50/50 pl-10"
+            className="input !bg-slate-900/30 pl-10"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -153,25 +156,25 @@ export default function LoansPage() {
             const remaining = loan.totalReceivable - repaid;
 
             return (
-              <div key={loan._id} className="card-hover !p-0 overflow-hidden group">
+              <div key={loan._id} className="card-hover !p-0 overflow-hidden group border-[var(--border)] bg-[var(--bg-secondary)]">
                 <div className="p-6">
                   {/* Card Header */}
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm group-hover:scale-110 transition-transform">
                         <User className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-slate-800 text-lg tracking-tight">{loan.borrowerName}</h3>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                        <h3 className="font-black text-[var(--text-primary)] text-xl tracking-tight">{loan.borrowerName}</h3>
+                        <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)] font-medium mt-0.5">
                           <Calendar className="w-3.5 h-3.5" />
                           {new Date(loan.startDate).toLocaleDateString()}
-                          <span className="text-slate-300">•</span>
-                          <span className="bg-slate-100 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider">{loan.duration}</span>
+                          <span className="text-slate-700">•</span>
+                          <span className="bg-slate-800/50 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider text-slate-400">{loan.duration}</span>
                         </div>
                       </div>
                     </div>
-                    <div className={loan.status === 'Settled' ? 'badge-success' : 'badge-info'}>
+                    <div className={loan.status === 'Settled' ? 'px-2 py-1 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'px-2 py-1 rounded text-[10px] font-bold uppercase bg-sky-500/10 text-sky-500 border border-sky-500/20'}>
                       {loan.status}
                     </div>
                   </div>
@@ -179,31 +182,31 @@ export default function LoansPage() {
                   {/* Financial Details */}
                   <div className="grid grid-cols-3 gap-4 mb-8">
                     <div className="space-y-1">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Principal</p>
-                      <p className="text-slate-700 font-bold text-lg">₹{loan.principalAmount.toLocaleString()}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold">Principal</p>
+                      <p className="text-[var(--text-primary)] font-bold text-lg">₹{loan.principalAmount.toLocaleString()}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Interest ({loan.interestRate}%)</p>
-                      <p className="text-emerald-600 font-bold text-lg">+₹{loan.interestAmount.toLocaleString()}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold">Interest ({loan.interestRate}%)</p>
+                      <p className="text-emerald-500 font-bold text-lg">+₹{loan.interestAmount.toLocaleString()}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Remaining</p>
-                      <p className="text-amber-600 font-bold text-lg">₹{remaining.toLocaleString()}</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold">Remaining</p>
+                      <p className="text-amber-500 font-bold text-lg">₹{remaining.toLocaleString()}</p>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
                   <div className="space-y-3 mb-8">
                     <div className="flex justify-between items-end">
-                      <span className="text-xs font-bold text-slate-500 flex items-center gap-2">
+                      <span className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-2">
                          Repayment Progress
                       </span>
-                      <span className="px-2 py-0.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-600">{progress.toFixed(1)}%</span>
+                      <span className="px-2 py-0.5 bg-slate-800/50 rounded-md text-[10px] font-bold text-slate-300">{progress.toFixed(1)}%</span>
                     </div>
-                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden p-0.5">
+                    <div className="h-3 bg-slate-900/50 rounded-full overflow-hidden p-0.5 border border-slate-800">
                       <div 
                         className={`h-full rounded-full transition-all duration-1000 ${
-                          loan.status === 'Settled' ? 'bg-emerald-500' : 'bg-gradient-to-r from-emerald-400 to-sky-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                          loan.status === 'Settled' ? 'bg-emerald-500' : 'bg-gradient-to-r from-emerald-500 to-sky-500 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
                         }`}
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       />
@@ -222,7 +225,7 @@ export default function LoansPage() {
                     </button>
                     <button 
                       onClick={() => { setSelectedLoan(loan); setIsLoanModalOpen(true); }}
-                      className="px-5 py-2.5 bg-slate-50 text-slate-600 rounded-2xl border border-slate-100 hover:bg-white hover:border-emerald-200 hover:text-emerald-600 transition-all text-xs font-bold"
+                      className="px-5 py-2.5 bg-slate-800/50 text-slate-300 rounded-2xl border border-slate-700 hover:bg-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition-all text-xs font-bold"
                     >
                       Edit
                     </button>
@@ -238,14 +241,20 @@ export default function LoansPage() {
       <LoanModal 
         isOpen={isLoanModalOpen}
         onClose={() => setIsLoanModalOpen(false)}
-        onSuccess={fetchLoans}
+        onSuccess={() => {
+          fetchLoans();
+          router.refresh();
+        }}
         loan={selectedLoan}
       />
 
       <RepaymentModal 
         isOpen={isRepayModalOpen}
         onClose={() => setIsRepayModalOpen(false)}
-        onSuccess={fetchLoans}
+        onSuccess={() => {
+          fetchLoans();
+          router.refresh();
+        }}
         loan={selectedLoan}
       />
     </div>

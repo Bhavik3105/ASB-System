@@ -109,7 +109,7 @@ export default function LoanModal({ isOpen, onClose, onSuccess, loan }: LoanModa
             <label className="label">Borrower Name</label>
             <input
               type="text"
-              className="input"
+              className="input !bg-slate-900/30"
               placeholder="Who are you lending to?"
               value={form.borrowerName}
               onChange={(e) => setForm({ ...form, borrowerName: e.target.value })}
@@ -124,7 +124,7 @@ export default function LoanModal({ isOpen, onClose, onSuccess, loan }: LoanModa
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">₹</span>
                 <input
                   type="number"
-                  className="input pl-8"
+                  className="input pl-8 !bg-slate-900/30"
                   placeholder="0.00"
                   value={form.principalAmount}
                   onChange={(e) => setForm({ ...form, principalAmount: e.target.value })}
@@ -138,7 +138,7 @@ export default function LoanModal({ isOpen, onClose, onSuccess, loan }: LoanModa
                 <input
                   type="number"
                   step="0.1"
-                  className="input pr-8"
+                  className="input pr-8 !bg-slate-900/30"
                   placeholder="2.5"
                   value={form.interestRate}
                   onChange={(e) => setForm({ ...form, interestRate: e.target.value })}
@@ -176,7 +176,7 @@ export default function LoanModal({ isOpen, onClose, onSuccess, loan }: LoanModa
               <label className="label">Duration</label>
               <input
                 type="text"
-                className="input"
+                className="input !bg-slate-900/30"
                 placeholder="e.g. 12 Months"
                 value={form.duration}
                 onChange={(e) => setForm({ ...form, duration: e.target.value })}
@@ -187,7 +187,7 @@ export default function LoanModal({ isOpen, onClose, onSuccess, loan }: LoanModa
               <label className="label">Start Date</label>
               <input
                 type="date"
-                className="input"
+                className="input !bg-slate-900/30"
                 value={form.startDate}
                 onChange={(e) => setForm({ ...form, startDate: e.target.value })}
                 required
@@ -198,7 +198,7 @@ export default function LoanModal({ isOpen, onClose, onSuccess, loan }: LoanModa
           <div>
             <label className="label">Notes (Optional)</label>
             <textarea
-              className="input min-h-[80px] py-3 h-auto"
+              className="input min-h-[80px] py-3 h-auto !bg-slate-900/30"
               placeholder="Add any specific terms or details..."
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
