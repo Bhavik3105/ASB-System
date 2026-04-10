@@ -9,9 +9,10 @@ interface TransactionModalProps {
   onClose: () => void;
   onSuccess: () => void;
   initialData?: any;
+  hideBankClient?: boolean;
 }
 
-export default function TransactionModal({ isOpen, onClose, onSuccess, initialData }: TransactionModalProps) {
+export default function TransactionModal({ isOpen, onClose, onSuccess, initialData, hideBankClient }: TransactionModalProps) {
   const [loading, setLoading] = useState(false);
   const defaultForm = {
     type: 'Deposit',
@@ -152,110 +153,112 @@ export default function TransactionModal({ isOpen, onClose, onSuccess, initialDa
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Searchable Bank Field */}
-              <div className="relative">
-                <label className="label">Bank (Required for Reports)</label>
+            {!hideBankClient && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Searchable Bank Field */}
                 <div className="relative">
-                  <input
-                    type="text"
-                    className="input pr-10"
-                    placeholder="Type to search bank..."
-                    value={bankSearch}
-                    onFocus={() => setShowBankResults(true)}
-                    onBlur={() => setTimeout(() => setShowBankResults(false), 200)}
-                    onChange={(e) => {
-                      setBankSearch(e.target.value);
-                      setShowBankResults(true);
-                      if (!e.target.value) setForm(prev => ({ ...prev, bankId: '' }));
-                    }}
-                  />
-                  {form.bankId && (
-                    <button 
-                      type="button" 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                      onClick={() => { setBankSearch(''); setForm(prev => ({ ...prev, bankId: '' })); }}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-                
-                {showBankResults && bankSearch && (
-                  <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
-                    {filteredBanks.length > 0 ? (
-                      filteredBanks.map((b: any) => (
-                        <div
-                          key={b._id}
-                          className="px-4 py-2 hover:bg-slate-800 cursor-pointer text-sm text-slate-200 border-b border-slate-800/50 last:border-0"
-                          onClick={() => {
-                            setForm({ ...form, bankId: b._id });
-                            setBankSearch(b.bankName);
-                            setShowBankResults(false);
-                          }}
-                        >
-                          <div className="font-medium">{b.bankName}</div>
-                          <div className="text-xs text-slate-500">{b.accountHolderName}</div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-sm text-slate-500 italic text-center">No banks found</div>
+                  <label className="label">Bank (Required for Reports)</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="input pr-10"
+                      placeholder="Type to search bank..."
+                      value={bankSearch}
+                      onFocus={() => setShowBankResults(true)}
+                      onBlur={() => setTimeout(() => setShowBankResults(false), 200)}
+                      onChange={(e) => {
+                        setBankSearch(e.target.value);
+                        setShowBankResults(true);
+                        if (!e.target.value) setForm(prev => ({ ...prev, bankId: '' }));
+                      }}
+                    />
+                    {form.bankId && (
+                      <button 
+                        type="button" 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                        onClick={() => { setBankSearch(''); setForm(prev => ({ ...prev, bankId: '' })); }}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
-                )}
-              </div>
-
-              {/* Searchable Client Field */}
-              <div className="relative">
-                <label className="label">Client (Optional)</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    className="input pr-10"
-                    placeholder="Type to search client..."
-                    value={clientSearch}
-                    onFocus={() => setShowClientResults(true)}
-                    onBlur={() => setTimeout(() => setShowClientResults(false), 200)}
-                    onChange={(e) => {
-                      setClientSearch(e.target.value);
-                      setShowClientResults(true);
-                      if (!e.target.value) setForm(prev => ({ ...prev, clientId: '' }));
-                    }}
-                  />
-                  {form.clientId && (
-                    <button 
-                      type="button" 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                      onClick={() => { setClientSearch(''); setForm(prev => ({ ...prev, clientId: '' })); }}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                  
+                  {showBankResults && bankSearch && (
+                    <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
+                      {filteredBanks.length > 0 ? (
+                        filteredBanks.map((b: any) => (
+                          <div
+                            key={b._id}
+                            className="px-4 py-2 hover:bg-slate-800 cursor-pointer text-sm text-slate-200 border-b border-slate-800/50 last:border-0"
+                            onClick={() => {
+                              setForm({ ...form, bankId: b._id });
+                              setBankSearch(b.bankName);
+                              setShowBankResults(false);
+                            }}
+                          >
+                            <div className="font-medium">{b.bankName}</div>
+                            <div className="text-xs text-slate-500">{b.accountHolderName}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-sm text-slate-500 italic text-center">No banks found</div>
+                      )}
+                    </div>
                   )}
                 </div>
 
-                {showClientResults && clientSearch && (
-                  <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
-                    {filteredClients.length > 0 ? (
-                      filteredClients.map((c: any) => (
-                        <div
-                          key={c._id}
-                          className="px-4 py-2 hover:bg-slate-800 cursor-pointer text-sm text-slate-200 border-b border-slate-800/50 last:border-0"
-                          onClick={() => {
-                            setForm({ ...form, clientId: c._id });
-                            setClientSearch(c.personName);
-                            setShowClientResults(false);
-                          }}
-                        >
-                          {c.personName}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-sm text-slate-500 italic text-center">No clients found</div>
+                {/* Searchable Client Field */}
+                <div className="relative">
+                  <label className="label">Client (Optional)</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="input pr-10"
+                      placeholder="Type to search client..."
+                      value={clientSearch}
+                      onFocus={() => setShowClientResults(true)}
+                      onBlur={() => setTimeout(() => setShowClientResults(false), 200)}
+                      onChange={(e) => {
+                        setClientSearch(e.target.value);
+                        setShowClientResults(true);
+                        if (!e.target.value) setForm(prev => ({ ...prev, clientId: '' }));
+                      }}
+                    />
+                    {form.clientId && (
+                      <button 
+                        type="button" 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                        onClick={() => { setClientSearch(''); setForm(prev => ({ ...prev, clientId: '' })); }}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     )}
                   </div>
-                )}
+
+                  {showClientResults && clientSearch && (
+                    <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
+                      {filteredClients.length > 0 ? (
+                        filteredClients.map((c: any) => (
+                          <div
+                            key={c._id}
+                            className="px-4 py-2 hover:bg-slate-800 cursor-pointer text-sm text-slate-200 border-b border-slate-800/50 last:border-0"
+                            onClick={() => {
+                              setForm({ ...form, clientId: c._id });
+                              setClientSearch(c.personName);
+                              setShowClientResults(false);
+                            }}
+                          >
+                            {c.personName}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-sm text-slate-500 italic text-center">No clients found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <label className="label">Amount</label>
@@ -316,8 +319,8 @@ export default function TransactionModal({ isOpen, onClose, onSuccess, initialDa
             <button type="button" onClick={onClose} className="btn-ghost" disabled={loading}>
               Cancel
             </button>
-            <button type="submit" className="btn-primary" disabled={loading || !form.amount || !form.bankId}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (initialData ? 'Update Transaction' : 'Save Transaction')}
+            <button type="submit" className="btn-primary" disabled={loading || !form.amount || (!hideBankClient && !form.bankId)}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (initialData ? 'Update' : 'Save')} Transaction
             </button>
           </div>
         </form>
