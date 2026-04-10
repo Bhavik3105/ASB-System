@@ -25,7 +25,9 @@ export async function GET(request: NextRequest) {
 
     // 1. Diagnostics: Check raw collection count
     // Use the raw collection to bypass Mongoose schema issues if any
-    const rawCount = await mongoose.connection.db.collection('clients').countDocuments({});
+    const rawCount = mongoose.connection.db 
+      ? await mongoose.connection.db.collection('clients').countDocuments({})
+      : 0;
 
     // 2. Simple List Mode
     if (!search && !bankId) {
