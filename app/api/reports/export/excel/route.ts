@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
         Reference: c.reference || '',
         Date: new Date(c.date).toLocaleDateString('en-IN'),
         'Deposit Amount': c.depositAmount,
+        'Buying Price': c.buyingPrice || 0,
         'Total Amount': c.totalAmount,
         'Business Type': c.businessType || '',
       }));

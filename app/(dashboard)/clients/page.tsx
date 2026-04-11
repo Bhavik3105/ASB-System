@@ -85,6 +85,7 @@ export default function ClientsPage() {
     { header: 'Reference', accessor: (row: any) => row.reference || '-' },
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },
     { header: 'Deposit Amt', accessor: (row: any) => formatCurrency(row.depositAmount) },
+    { header: 'Buying Price', accessor: (row: any) => formatCurrency(row.buyingPrice || 0) },
     { header: 'Status', accessor: (row: any) => (
        <span className={row.isActive ? 'badge-success' : 'badge-danger'}>
          {row.isActive ? 'Active' : 'Inactive'}

@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { personName, banks, mobileNumber, email, bankType, reference, depositAmount, businessType, date, totalAmount } = body;
+    const { personName, banks, mobileNumber, email, bankType, reference, depositAmount, buyingPrice, businessType, date, totalAmount } = body;
 
     if (!personName || !mobileNumber || !date) {
       return NextResponse.json({ success: false, error: 'personName, mobileNumber, date are required' }, { status: 400 });
@@ -143,7 +143,10 @@ export async function POST(request: NextRequest) {
 
     const client = await Client.create({
       personName, banks: banks || [], mobileNumber, email, bankType,
-      reference, depositAmount: Number(depositAmount || 0), businessType,
+      reference, 
+      depositAmount: Number(depositAmount || 0), 
+      buyingPrice: Number(buyingPrice || 0),
+      businessType,
       date: new Date(date), totalAmount: Number(totalAmount || 0),
       createdBy: session.userId,
     });

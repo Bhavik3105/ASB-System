@@ -20,6 +20,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     bankType: '',
     reference: '',
     depositAmount: '',
+    buyingPrice: '',
     businessType: '',
     date: new Date().toISOString().split('T')[0],
   };
@@ -54,6 +55,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
         body: JSON.stringify({
           ...form,
           depositAmount: form.depositAmount ? parseFloat(form.depositAmount as string) : 0,
+          buyingPrice: form.buyingPrice ? parseFloat(form.buyingPrice as string) : 0,
         }),
       });
 
@@ -154,6 +156,20 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                 />
               </div>
               <div>
+                <label className="label">Buying Price</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="input"
+                  value={form.buyingPrice}
+                  onChange={(e) => setForm({ ...form, buyingPrice: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
                 <label className="label">Business Type</label>
                 <input
                   type="text"
@@ -162,9 +178,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, businessType: e.target.value })}
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Date</label>
                 <input
