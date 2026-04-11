@@ -139,7 +139,27 @@ export async function GET(request: NextRequest) {
 
     // ── 5. VISUALIZATION DATA ────────────────────────────────────────
     const thirtyDaysAgo = new Date(today);
-// ... existing visualization logic ...
+    thirtyDaysAgo.setDate(today.getDate() - 29);
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+    const dailyChartData = await Transaction.aggregate([
+      { $match: { date: { $gte: thirtyDaysAgo, $lte: endDay } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          commission: { $sum: '$commission' },
+          deposits: { $sum: { $cond: [{ $eq: ['$type', 'Deposit'] }, '$commission', 0] } },
+          withdrawals: { $sum: { $cond: [{ $eq: ['$type', 'Withdrawal'] }, '$commission', 0] } },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const expenseBreakdown = await Expense.aggregate([
+      { $match: { date: { $gte: startMonth, $lte: endMonth } } },
+      { $group: { _id: '$type', total: { $sum: '$amount' } } },
+    ]);
+
     return NextResponse.json({
       success: true,
       data: {
