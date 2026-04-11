@@ -16,8 +16,11 @@ export default function DashboardPage() {
     totalMonthlyBuyingPrices: 0,
     netMonthlyProfit: 0,
     totalYearlyProfit: 0,
+    monthlyHistory: [] as any[],
   });
   const [loading, setLoading] = useState(true);
+
+  const formatCurrency = (val: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val);
 
   const fetchStats = async () => {
     try {
@@ -120,6 +123,52 @@ export default function DashboardPage() {
           loading={loading}
           trend="Year to date (YTD)"
         />
+      </div>
+
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-3xl p-8 shadow-sm">
+        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-cyan-400" />
+          Monthly Performance History ({selectedYear})
+        </h2>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-[var(--border)]">
+                <th className="pb-4 font-bold text-[var(--text-secondary)] text-sm uppercase px-4">Month</th>
+                <th className="pb-4 font-bold text-[var(--text-secondary)] text-sm uppercase px-4 text-right">Commission</th>
+                <th className="pb-4 font-bold text-[var(--text-secondary)] text-sm uppercase px-4 text-right">Total Costs</th>
+                <th className="pb-4 font-bold text-[var(--text-secondary)] text-sm uppercase px-4 text-right">Net Profit</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border)]">
+              {(data.monthlyHistory || []).map((row, i) => (
+                <tr key={i} className="group hover:bg-[var(--bg-card)] transition-colors">
+                  <td className="py-4 px-4 font-bold text-[var(--text-primary)]">{row.name}</td>
+                  <td className="py-4 px-4 text-right font-mono text-emerald-400">{formatCurrency(row.commission)}</td>
+                  <td className="py-4 px-4 text-right font-mono text-red-500">{formatCurrency(row.costs)}</td>
+                  <td className={`py-4 px-4 text-right font-black font-mono ${(row.profit || 0) >= 0 ? 'text-cyan-400' : 'text-red-500'}`}>
+                    {formatCurrency(row.profit || 0)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+               <tr className="border-t-2 border-[var(--border)] bg-[var(--bg-card)]">
+                 <td className="py-4 px-4 font-black">ANNUAL TOTAL</td>
+                 <td className="py-4 px-4 text-right font-black text-emerald-400">
+                    {formatCurrency((data.monthlyHistory || []).reduce((acc, r) => acc + (r.commission || 0), 0))}
+                 </td>
+                 <td className="py-4 px-4 text-right font-black text-red-500">
+                    {formatCurrency((data.monthlyHistory || []).reduce((acc, r) => acc + (r.costs || 0), 0))}
+                 </td>
+                 <td className={`py-4 px-4 text-right font-black text-xl ${data.totalYearlyProfit >= 0 ? 'text-cyan-400' : 'text-red-500'}`}>
+                    {formatCurrency(data.totalYearlyProfit)}
+                 </td>
+               </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
     </div>
   );

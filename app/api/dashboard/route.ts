@@ -102,29 +102,44 @@ export async function GET(request: NextRequest) {
     const totalYearlyProfit = (annualCommissions[0]?.total ?? 0) - 
                              ((annualExpenses[0]?.total ?? 0) + (annualSalaries[0]?.total ?? 0) + (annualBuyingPrices[0]?.total ?? 0));
 
-    // ── 4. VISUALIZATION DATA ────────────────────────────────────────
+    // ── 4. MONTHLY HISTORY BREAKDOWN (12 MONTHS) ────────────────────
+    const monthlyCommissions = await Transaction.aggregate([
+      { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
+      { $group: { _id: { $month: '$date' }, total: { $sum: '$commission' } } }
+    ]);
+    const monthlyExpenses = await Expense.aggregate([
+      { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
+      { $group: { _id: { $month: '$date' }, total: { $sum: '$amount' } } }
+    ]);
+    const monthlySalaries = await Salary.aggregate([
+      { $match: { year: targetYear } },
+      { $group: { _id: '$month', total: { $sum: { $subtract: [{ $add: ['$baseSalarySnapshot', '$bonusAmount'] }, '$advanceAmount'] } } } }
+    ]);
+    const monthlyBuyingPrices = await Client.aggregate([
+      { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
+      { $group: { _id: { $month: '$date' }, total: { $sum: '$buyingPrice' } } }
+    ]);
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlyHistory = months.map((name, i) => {
+      const m = i + 1;
+      const comm = monthlyCommissions.find(x => x._id === m)?.total || 0;
+      const exp = monthlyExpenses.find(x => x._id === m)?.total || 0;
+      const sal = monthlySalaries.find(x => x._id === m)?.total || 0;
+      const buy = monthlyBuyingPrices.find(x => x._id === m)?.total || 0;
+      const totalCosts = exp + sal + buy;
+      return {
+        name,
+        month: m,
+        commission: comm,
+        costs: totalCosts,
+        profit: comm - totalCosts
+      };
+    });
+
+    // ── 5. VISUALIZATION DATA ────────────────────────────────────────
     const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 29);
-    thirtyDaysAgo.setHours(0, 0, 0, 0);
-
-    const dailyChartData = await Transaction.aggregate([
-      { $match: { date: { $gte: thirtyDaysAgo, $lte: endDay } } },
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
-          commission: { $sum: '$commission' },
-          deposits: { $sum: { $cond: [{ $eq: ['$type', 'Deposit'] }, '$commission', 0] } },
-          withdrawals: { $sum: { $cond: [{ $eq: ['$type', 'Withdrawal'] }, '$commission', 0] } },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
-
-    const expenseBreakdown = await Expense.aggregate([
-      { $match: { date: { $gte: startMonth, $lte: endMonth } } },
-      { $group: { _id: '$type', total: { $sum: '$amount' } } },
-    ]);
-
+// ... existing visualization logic ...
     return NextResponse.json({
       success: true,
       data: {
@@ -135,6 +150,7 @@ export async function GET(request: NextRequest) {
         totalMonthlyBuyingPrices,
         netMonthlyProfit,
         totalYearlyProfit,
+        monthlyHistory,
         dailyChartData,
         expenseBreakdown,
       },
