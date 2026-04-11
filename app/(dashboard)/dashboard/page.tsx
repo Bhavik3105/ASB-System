@@ -12,7 +12,10 @@ export default function DashboardPage() {
     totalDailyCommission: 0,
     totalMonthlyCommission: 0,
     totalMonthlyExpenses: 0,
+    totalMonthlySalaries: 0,
+    totalMonthlyBuyingPrices: 0,
     netMonthlyProfit: 0,
+    totalYearlyProfit: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -76,7 +79,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <StatsCard
           title="Daily Commission"
           value={data.totalDailyCommission}
@@ -95,10 +98,11 @@ export default function DashboardPage() {
         />
         <StatsCard
           title="Monthly Expenses"
-          value={data.totalMonthlyExpenses}
+          value={data.totalMonthlyExpenses + data.totalMonthlySalaries + data.totalMonthlyBuyingPrices}
           icon={AlertCircle}
           color="red"
           loading={loading}
+          trend="Incl. Salaries & Buying"
         />
         <StatsCard
           title="Net Monthly Profit"
@@ -106,7 +110,15 @@ export default function DashboardPage() {
           icon={IndianRupee}
           color="amber"
           loading={loading}
-          trend="Commission - Expenses"
+          trend="Final take-home"
+        />
+        <StatsCard
+          title="Annual Net Profit"
+          value={data.totalYearlyProfit}
+          icon={TrendingUp}
+          color="cyan"
+          loading={loading}
+          trend="Year to date (YTD)"
         />
       </div>
     </div>

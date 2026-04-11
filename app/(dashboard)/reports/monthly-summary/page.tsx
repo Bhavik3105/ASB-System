@@ -53,24 +53,33 @@ export default function MonthlySummaryPrint() {
       </div>
 
       {/* Main Stats */}
-      <div className="grid grid-cols-2 gap-10 mb-16">
-        <div className="p-8 bg-slate-50 border-l-4 border-emerald-500">
+      <div className="grid grid-cols-2 gap-10 mb-10">
+        <div className="p-8 bg-slate-50 border-l-4 border-emerald-500 shadow-sm">
           <p className="text-xs font-bold text-slate-500 uppercase mb-2">Total Monthly Commission</p>
           <p className="text-3xl font-black text-slate-900">{formatCurrency(data.totalMonthlyCommission)}</p>
         </div>
-        <div className="p-8 bg-slate-50 border-l-4 border-red-500">
-          <p className="text-xs font-bold text-slate-500 uppercase mb-2">Total Monthly Expenses</p>
+        <div className="p-8 bg-slate-50 border-l-4 border-red-500 shadow-sm">
+          <p className="text-xs font-bold text-slate-500 uppercase mb-2">General Monthly Expenses</p>
           <p className="text-3xl font-black text-slate-900">{formatCurrency(data.totalMonthlyExpenses)}</p>
+        </div>
+        <div className="p-8 bg-slate-50 border-l-4 border-amber-500 shadow-sm">
+          <p className="text-xs font-bold text-slate-500 uppercase mb-2">Total Monthly Salaries</p>
+          <p className="text-3xl font-black text-slate-900">{formatCurrency(data.totalMonthlySalaries)}</p>
+        </div>
+        <div className="p-8 bg-slate-50 border-l-4 border-blue-500 shadow-sm">
+          <p className="text-xs font-bold text-slate-500 uppercase mb-2">Total Buying Prices</p>
+          <p className="text-3xl font-black text-slate-900">{formatCurrency(data.totalMonthlyBuyingPrices)}</p>
         </div>
       </div>
 
       {/* Net Profit Section */}
-      <div className="bg-slate-900 text-white p-10 rounded-2xl mb-16 flex justify-between items-center">
+      <div className="bg-slate-900 text-white p-10 rounded-2xl mb-16 flex justify-between items-center shadow-xl">
         <div>
-          <p className="text-sm font-bold text-emerald-400 uppercase mb-2 tracking-widest">Net Monthly Profit</p>
-          <h2 className="text-5xl font-black">{formatCurrency(data.netMonthlyProfit)}</h2>
+          <p className="text-sm font-bold text-emerald-400 uppercase mb-2 tracking-widest">Final Net Profit Retention</p>
+          <h2 className="text-6xl font-black">{formatCurrency(data.netMonthlyProfit)}</h2>
+          <p className="text-xs text-slate-400 mt-2 italic">*After deducting general expenses, salaries, and bank purchase costs.</p>
         </div>
-        <IndianRupee className="w-16 h-16 opacity-20" />
+        <TrendingUp className="w-16 h-16 opacity-20" />
       </div>
 
       {/* Summary Breakdown */}
