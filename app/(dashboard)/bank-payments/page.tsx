@@ -72,13 +72,15 @@ export default function BankPaymentsPage() {
         </span>
       )
     },
+    { header: 'Payment Date', accessor: (row: any) => row.lastPaymentDate ? formatDate(row.lastPaymentDate) : '-' },
+    { header: 'Payment Mode', accessor: (row: any) => row.lastPaymentMode || '-' },
   ];
 
   const historyColumns = [
-    { header: 'Date', accessor: (row: any) => formatDate(row.date) },
+    { header: 'Payment Date', accessor: (row: any) => formatDate(row.date) },
     { header: 'Party Name', accessor: 'referenceName' },
     { header: 'Amount', accessor: (row: any) => formatCurrency(row.amount) },
-    { header: 'Mode', accessor: 'paymentMode' },
+    { header: 'Payment Mode', accessor: 'paymentMode' },
     { header: 'Note', accessor: (row: any) => row.note || '-' },
     { header: 'Actions', accessor: (row: any) => (
        <div className="flex items-center gap-2">

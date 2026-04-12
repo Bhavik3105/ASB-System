@@ -22,25 +22,37 @@ export async function GET() {
       { $group: { _id: '$reference', totalDue: { $sum: '$buyingPrice' } } }
     ]);
 
-    // 2. Aggregate Total Paid from BankPayments by Reference
-    const paidByReference = await BankPayment.aggregate([
-      { $group: { _id: '$referenceName', totalPaid: { $sum: '$amount' } } }
+    // 2. Aggregate Paid details from BankPayments by Reference
+    const paidDetails = await BankPayment.aggregate([
+      { $sort: { date: -1, createdAt: -1 } },
+      { 
+        $group: { 
+          _id: '$referenceName', 
+          totalPaid: { $sum: '$amount' },
+          lastPaymentDate: { $first: '$date' },
+          lastPaymentMode: { $first: '$paymentMode' }
+        } 
+      }
     ]);
 
     // 3. Merge Results
     const references = Array.from(new Set([
       ...dueByReference.map(r => r._id),
-      ...paidByReference.map(r => r._id)
+      ...paidDetails.map(r => r._id)
     ]));
 
     const ledger = references.map(name => {
       const due = dueByReference.find(r => r._id === name)?.totalDue || 0;
-      const paid = paidByReference.find(r => r._id === name)?.totalPaid || 0;
+      const paidInfo = paidDetails.find(r => r._id === name);
+      const paid = paidInfo?.totalPaid || 0;
+      
       return {
         referenceName: name,
         totalDue: due,
         totalPaid: paid,
-        balance: due - paid
+        balance: due - paid,
+        lastPaymentDate: paidInfo?.lastPaymentDate,
+        lastPaymentMode: paidInfo?.lastPaymentMode
       };
     }).sort((a, b) => b.balance - a.balance);
 
