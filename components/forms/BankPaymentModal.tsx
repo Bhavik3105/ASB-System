@@ -8,9 +8,10 @@ interface BankPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: any;
 }
 
-export default function BankPaymentModal({ isOpen, onClose, onSuccess }: BankPaymentModalProps) {
+export default function BankPaymentModal({ isOpen, onClose, onSuccess, initialData }: BankPaymentModalProps) {
   const [loading, setLoading] = useState(false);
   const [references, setReferences] = useState<string[]>([]);
   const [fetchingRefs, setFetchingRefs] = useState(false);
@@ -26,10 +27,17 @@ export default function BankPaymentModal({ isOpen, onClose, onSuccess }: BankPay
 
   useEffect(() => {
     if (isOpen) {
-      setForm(defaultForm);
+      if (initialData) {
+        setForm({
+          ...initialData,
+          date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : defaultForm.date,
+        });
+      } else {
+        setForm(defaultForm);
+      }
       fetchReferences();
     }
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   const fetchReferences = async () => {
     try {
@@ -53,12 +61,15 @@ export default function BankPaymentModal({ isOpen, onClose, onSuccess }: BankPay
     setLoading(true);
 
     try {
-      const res = await fetch('/api/bank-payments', {
-        method: 'POST',
+      const url = initialData ? `/api/bank-payments/${initialData._id}` : '/api/bank-payments';
+      const method = initialData ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          amount: parseFloat(form.amount),
+          amount: parseFloat(form.amount as string),
         }),
       });
 
@@ -81,7 +92,7 @@ export default function BankPaymentModal({ isOpen, onClose, onSuccess }: BankPay
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal-header">
-          <h2 className="text-xl font-bold text-[var(--text-primary)]">Add Bank Payment</h2>
+          <h2 className="text-xl font-bold text-[var(--text-primary)]">{initialData ? 'Edit Bank Payment' : 'Add Bank Payment'}</h2>
           <button onClick={onClose} className="transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             <X className="w-5 h-5" />
           </button>
@@ -166,7 +177,7 @@ export default function BankPaymentModal({ isOpen, onClose, onSuccess }: BankPay
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={loading || !form.referenceName || !form.amount}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Payment'}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (initialData ? 'Update Payment' : 'Save Payment')}
             </button>
           </div>
         </form>

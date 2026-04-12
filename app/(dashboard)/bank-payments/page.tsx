@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/tables/DataTable';
-import { CreditCard, Plus, Trash2, History, ListFilter } from 'lucide-react';
+import { CreditCard, Plus, Trash2, History, ListFilter, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import BankPaymentModal from '@/components/forms/BankPaymentModal';
@@ -12,6 +12,7 @@ export default function BankPaymentsPage() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'summary' | 'history'>('summary');
 
   const fetchData = async () => {
@@ -37,6 +38,11 @@ export default function BankPaymentsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleEdit = (payment: any) => {
+    setSelectedPayment(payment);
+    setIsModalOpen(true);
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this payment record?')) return;
@@ -75,9 +81,14 @@ export default function BankPaymentsPage() {
     { header: 'Mode', accessor: 'paymentMode' },
     { header: 'Note', accessor: (row: any) => row.note || '-' },
     { header: 'Actions', accessor: (row: any) => (
-       <button onClick={() => handleDelete(row._id)} className="p-1 text-slate-400 hover:text-red-400 transition-colors">
-         <Trash2 className="w-4 h-4" />
-       </button>
+       <div className="flex items-center gap-2">
+         <button onClick={() => handleEdit(row)} className="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+           <Pencil className="w-4 h-4" />
+         </button>
+         <button onClick={() => handleDelete(row._id)} className="p-1 text-slate-400 hover:text-red-400 transition-colors">
+           <Trash2 className="w-4 h-4" />
+         </button>
+       </div>
     )},
   ];
 
@@ -90,7 +101,10 @@ export default function BankPaymentsPage() {
            </h1>
            <p className="page-subtitle">Track settlements and balances with purchase parties.</p>
          </div>
-         <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
+         <button className="btn-primary" onClick={() => {
+           setSelectedPayment(null);
+           setIsModalOpen(true);
+         }}>
            <Plus className="w-4 h-4" /> Add Payment
          </button>
       </div>
@@ -118,8 +132,12 @@ export default function BankPaymentsPage() {
 
       <BankPaymentModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedPayment(null);
+        }} 
         onSuccess={fetchData}
+        initialData={selectedPayment}
       />
     </div>
   );
