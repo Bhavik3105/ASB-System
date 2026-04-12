@@ -15,7 +15,6 @@ export default function DashboardPage() {
     totalMonthlySalaries: 0,
     totalMonthlyBuyingPrices: 0,
     netMonthlyProfit: 0,
-    totalYearlyProfit: 0,
     monthlyHistory: [] as any[],
   });
   const [loading, setLoading] = useState(true);
@@ -82,7 +81,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Daily Commission"
           value={data.totalDailyCommission}
@@ -115,14 +114,6 @@ export default function DashboardPage() {
           loading={loading}
           trend="Final take-home"
         />
-        <StatsCard
-          title="Annual Net Profit"
-          value={data.totalYearlyProfit}
-          icon={TrendingUp}
-          color="cyan"
-          loading={loading}
-          trend="Year to date (YTD)"
-        />
       </div>
 
       <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-3xl p-8 shadow-sm">
@@ -146,27 +137,13 @@ export default function DashboardPage() {
                 <tr key={i} className="group hover:bg-[var(--bg-card)] transition-colors">
                   <td className="py-4 px-4 font-bold text-[var(--text-primary)]">{row.name}</td>
                   <td className="py-4 px-4 text-right font-mono text-emerald-400">{formatCurrency(row.commission)}</td>
-                  <td className="py-4 px-4 text-right font-mono text-red-500">{formatCurrency(row.costs)}</td>
+                  <td className="py-4 px-4 text-right font-mono text-red-400">{formatCurrency(row.costs)}</td>
                   <td className={`py-4 px-4 text-right font-black font-mono ${(row.profit || 0) >= 0 ? 'text-cyan-400' : 'text-red-500'}`}>
                     {formatCurrency(row.profit || 0)}
                   </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot>
-               <tr className="border-t-2 border-[var(--border)] bg-[var(--bg-card)]">
-                 <td className="py-4 px-4 font-black">ANNUAL TOTAL</td>
-                 <td className="py-4 px-4 text-right font-black text-emerald-400">
-                    {formatCurrency((data.monthlyHistory || []).reduce((acc, r) => acc + (r.commission || 0), 0))}
-                 </td>
-                 <td className="py-4 px-4 text-right font-black text-red-500">
-                    {formatCurrency((data.monthlyHistory || []).reduce((acc, r) => acc + (r.costs || 0), 0))}
-                 </td>
-                 <td className={`py-4 px-4 text-right font-black text-xl ${data.totalYearlyProfit >= 0 ? 'text-cyan-400' : 'text-red-500'}`}>
-                    {formatCurrency(data.totalYearlyProfit)}
-                 </td>
-               </tr>
-            </tfoot>
           </table>
         </div>
       </div>

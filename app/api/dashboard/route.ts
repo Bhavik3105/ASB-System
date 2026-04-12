@@ -74,35 +74,10 @@ export async function GET(request: NextRequest) {
     // Net monthly profit calculation
     const netMonthlyProfit = totalMonthlyCommission - (totalMonthlyExpenses + totalMonthlySalaries + totalMonthlyBuyingPrices);
 
-    // ── 3. YEARLY STATS (Cumulative Profit) ──────────────────────────
+    // ── 3. MONTHLY HISTORY BREAKDOWN (12 MONTHS) ────────────────────
     const startOfYear = new Date(targetYear, 0, 1);
     const endOfYear = new Date(targetYear, 11, 31, 23, 59, 59, 999);
 
-    // Annual Commissions
-    const annualCommissions = await Transaction.aggregate([
-      { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
-      { $group: { _id: null, total: { $sum: '$commission' } } }
-    ]);
-    // Annual Expenses
-    const annualExpenses = await Expense.aggregate([
-      { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
-      { $group: { _id: null, total: { $sum: '$amount' } } }
-    ]);
-    // Annual Salaries
-    const annualSalaries = await Salary.aggregate([
-      { $match: { year: targetYear } },
-      { $group: { _id: null, total: { $sum: { $subtract: [{ $add: ['$baseSalarySnapshot', '$bonusAmount'] }, '$advanceAmount'] } } } }
-    ]);
-    // Annual Buying Prices
-    const annualBuyingPrices = await Client.aggregate([
-      { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
-      { $group: { _id: null, total: { $sum: '$buyingPrice' } } }
-    ]);
-
-    const totalYearlyProfit = (annualCommissions[0]?.total ?? 0) - 
-                             ((annualExpenses[0]?.total ?? 0) + (annualSalaries[0]?.total ?? 0) + (annualBuyingPrices[0]?.total ?? 0));
-
-    // ── 4. MONTHLY HISTORY BREAKDOWN (12 MONTHS) ────────────────────
     const monthlyCommissions = await Transaction.aggregate([
       { $match: { date: { $gte: startOfYear, $lte: endOfYear } } },
       { $group: { _id: { $month: '$date' }, total: { $sum: '$commission' } } }
@@ -169,7 +144,6 @@ export async function GET(request: NextRequest) {
         totalMonthlySalaries,
         totalMonthlyBuyingPrices,
         netMonthlyProfit,
-        totalYearlyProfit,
         monthlyHistory,
         dailyChartData,
         expenseBreakdown,

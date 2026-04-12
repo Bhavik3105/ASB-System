@@ -87,7 +87,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
         <form onSubmit={handleSubmit}>
           <div className="modal-body space-y-4">
             <div>
-              <label className="label">Name</label>
+              <label className="label">Person Name</label>
               <input
                 type="text"
                 className="input"
