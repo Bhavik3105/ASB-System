@@ -13,6 +13,7 @@ export interface IClient extends Document {
   date: Date;
   totalAmount: number;
   isActive: boolean;
+  status: 'Active' | 'Frozen';
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -32,6 +33,7 @@ const ClientSchema = new Schema<IClient>(
     date: { type: Date, required: true },
     totalAmount: { type: Number, default: 0, min: 0 },
     isActive: { type: Boolean, default: true },
+    status: { type: String, enum: ['Active', 'Frozen'], default: 'Active' },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }

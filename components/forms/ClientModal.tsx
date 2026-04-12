@@ -22,6 +22,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     depositAmount: '',
     buyingPrice: '',
     businessType: '',
+    status: 'Active',
     date: new Date().toISOString().split('T')[0],
   };
   const [form, setForm] = useState(defaultForm);
@@ -179,15 +180,27 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                 />
               </div>
               <div>
-                <label className="label">Date</label>
-                <input
-                  type="date"
-                  className="input"
-                  value={form.date}
-                  onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  required
-                />
+                <label className="label">Status</label>
+                <select
+                  className="select"
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value as any })}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Frozen">Frozen</option>
+                </select>
               </div>
+            </div>
+
+            <div>
+              <label className="label">Purchase Date</label>
+              <input
+                type="date"
+                className="input"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                required
+              />
             </div>
           </div>
 
