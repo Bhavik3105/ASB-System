@@ -1,11 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/lib/db';
 import Client from '@/models/Client';
 import BankPayment from '@/models/BankPayment';
+import { requireAuth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
     await connectDB();
+    await requireAuth();
+
+    // Explicitly ensure models are registered
+    if (!mongoose.models.Client) console.log('Registering Client model manually...');
+    if (!mongoose.models.BankPayment) console.log('Registering BankPayment model manually...');
 
     // 1. Aggregate Total Due (Buying Price) from Clients by Reference
     const dueByReference = await Client.aggregate([

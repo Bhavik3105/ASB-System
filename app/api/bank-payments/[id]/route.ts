@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectDB from '@/lib/db';
 import BankPayment from '@/models/BankPayment';
 import { requireAuth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
