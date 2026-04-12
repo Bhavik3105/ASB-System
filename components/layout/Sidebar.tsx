@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Receipt, ArrowLeftRight, Landmark, Users, ShoppingCart, FileText, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Receipt, ArrowLeftRight, Landmark, Users, ShoppingCart, FileText, TrendingUp, CreditCard } from 'lucide-react';
 import Image from 'next/image';
 import logo from '@/public/logo.jpeg';
 
@@ -12,6 +12,7 @@ const navItems = [
   { name: 'Banks', href: '/banks', icon: Landmark },
   { name: 'Bank Limits', href: '/bank-limits', icon: ArrowLeftRight },
   { name: 'Bank Purchase', href: '/clients', icon: Users },
+  { name: 'Bank Payment', href: '/bank-payments', icon: CreditCard },
   { name: 'Loans', href: '/loans', icon: Landmark },
   { name: 'Salary', href: '/salary', icon: TrendingUp },
   { name: 'Commissions', href: '/commissions', icon: TrendingUp },

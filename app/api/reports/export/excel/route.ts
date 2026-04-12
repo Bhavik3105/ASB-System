@@ -7,6 +7,7 @@ import Bank from '@/models/Bank';
 import Loan from '@/models/Loan';
 import Salary from '@/models/Salary';
 import Employee from '@/models/Employee';
+import BankPayment from '@/models/BankPayment';
 import * as XLSX from 'xlsx';
 
 export async function GET(request: NextRequest) {
@@ -150,6 +151,31 @@ export async function GET(request: NextRequest) {
         };
       });
       XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Salary');
+    }
+
+    // ── BANK PAYMENTS ──────────────────────────────────────────────
+    if (module === 'all' || module === 'bank-payments') {
+      const payments = await BankPayment.find(dateFilter).sort({ date: -1 }).lean();
+      const data = payments.map((p) => ({
+        Date: new Date(p.date).toLocaleDateString('en-IN'),
+        Party: p.referenceName,
+        Amount: p.amount,
+        Mode: p.paymentMode || '',
+        Note: p.note || '',
+      }));
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Bank Payments');
+
+      if (module === 'bank-payments' || module === 'all') {
+        const dueByRef = await Client.aggregate([{ $group: { _id: '$reference', due: { $sum: '$buyingPrice' } } }]);
+        const paidByRef = await BankPayment.aggregate([{ $group: { _id: '$referenceName', paid: { $sum: '$amount' } } }]);
+        const refs = Array.from(new Set([...dueByRef.map(r => r._id), ...paidByRef.map(r => r._id)]));
+        const ledger = refs.filter(r => r).map(name => {
+          const due = dueByRef.find(r => r._id === name)?.due || 0;
+          const paid = paidByRef.find(r => r._id === name)?.paid || 0;
+          return { Party: name, 'Total Due': due, 'Total Paid': paid, Balance: due - paid };
+        });
+        XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(ledger.length ? ledger : [{}]), 'Bank Ledger');
+      }
     }
 
     // Ensure at least one sheet exists

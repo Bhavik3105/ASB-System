@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import Expense from '@/models/Expense';
+import BankPayment from '@/models/BankPayment';
 import { getStartOfMonth, getEndOfMonth } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
@@ -14,16 +15,18 @@ export async function GET(request: NextRequest) {
     const start = startDate ? new Date(startDate) : getStartOfMonth();
     const end = endDate ? new Date(endDate + 'T23:59:59.999Z') : getEndOfMonth();
 
-    const [transactions, expenses] = await Promise.all([
+    const [transactions, expenses, bankPayments] = await Promise.all([
       Transaction.find({ date: { $gte: start, $lte: end } })
         .populate('clientId', 'personName')
         .populate('bankId', 'bankName')
         .lean(),
       Expense.find({ date: { $gte: start, $lte: end } }).lean(),
+      BankPayment.find({ date: { $gte: start, $lte: end } }).lean(),
     ]);
 
     const totalCommission = transactions.reduce((s, t) => s + t.commission, 0);
     const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+    const totalBankPayments = bankPayments.reduce((s, p) => s + p.amount, 0);
 
     // Return structured JSON for client-side PDF generation
     return NextResponse.json({
@@ -33,10 +36,12 @@ export async function GET(request: NextRequest) {
         summary: {
           totalCommission,
           totalExpenses,
+          totalBankPayments,
           netProfit: totalCommission - totalExpenses,
         },
         transactions,
         expenses,
+        bankPayments,
       },
     });
   } catch (error) {
