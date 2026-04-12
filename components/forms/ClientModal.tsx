@@ -32,6 +32,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
       if (initialData) {
         setForm({
           ...initialData,
+          status: initialData.status || 'Active',
           date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : defaultForm.date,
         });
       } else {

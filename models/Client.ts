@@ -48,5 +48,9 @@ ClientSchema.index(
   { name: 'client_text_search' }
 );
 
+if (process.env.NODE_ENV === 'development') {
+  delete (mongoose.models as any).Client;
+}
+
 const Client: Model<IClient> = mongoose.models.Client || mongoose.model<IClient>('Client', ClientSchema);
 export default Client;

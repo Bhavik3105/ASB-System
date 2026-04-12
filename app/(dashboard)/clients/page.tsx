@@ -87,7 +87,7 @@ export default function ClientsPage() {
     { header: 'Deposit Amt', accessor: (row: any) => formatCurrency(row.depositAmount) },
     { header: 'Buying Price', accessor: (row: any) => formatCurrency(row.buyingPrice || 0) },
     { header: 'Status', accessor: (row: any) => (
-       <span className={row.status === 'Active' ? 'badge-success' : 'badge-warning'}>
+       <span className={row.status === 'Frozen' ? 'badge-warning' : 'badge-success'}>
          {row.status || 'Active'}
        </span>
     )},
