@@ -29,8 +29,7 @@ export async function GET() {
         $group: { 
           _id: '$referenceName', 
           totalPaid: { $sum: '$amount' },
-          lastPaymentDate: { $first: '$date' },
-          lastPaymentMode: { $first: '$paymentMode' }
+          latestPayment: { $first: '$$ROOT' }
         } 
       }
     ]);
@@ -51,8 +50,9 @@ export async function GET() {
         totalDue: due,
         totalPaid: paid,
         balance: due - paid,
-        lastPaymentDate: paidInfo?.lastPaymentDate,
-        lastPaymentMode: paidInfo?.lastPaymentMode
+        lastPaymentDate: paidInfo?.latestPayment?.date,
+        lastPaymentMode: paidInfo?.latestPayment?.paymentMode,
+        latestPayment: paidInfo?.latestPayment
       };
     }).sort((a, b) => b.balance - a.balance);
 

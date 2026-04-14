@@ -74,6 +74,20 @@ export default function BankPaymentsPage() {
     },
     { header: 'Payment Date', accessor: (row: any) => row.lastPaymentDate ? formatDate(row.lastPaymentDate) : '-' },
     { header: 'Payment Mode', accessor: (row: any) => row.lastPaymentMode || '-' },
+    { header: 'Actions', accessor: (row: any) => (
+       <div className="flex items-center gap-2">
+         {row.latestPayment ? (
+           <>
+             <button onClick={() => handleEdit(row.latestPayment)} className="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+               <Pencil className="w-4 h-4" />
+             </button>
+             <button onClick={() => handleDelete(row.latestPayment._id)} className="p-1 text-slate-400 hover:text-red-400 transition-colors">
+               <Trash2 className="w-4 h-4" />
+             </button>
+           </>
+         ) : <span className="text-xs text-slate-600 italic">No payments</span>}
+       </div>
+    )},
   ];
 
   const historyColumns = [
