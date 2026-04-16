@@ -4,7 +4,13 @@ import connectDB from '@/lib/db';
 import Client from '@/models/Client';
 import Bank from '@/models/Bank';
 import Transaction from '@/models/Transaction';
+import Expense from '@/models/Expense';
+import Loan from '@/models/Loan';
+import BankPayment from '@/models/BankPayment';
+import Employee from '@/models/Employee';
 import { requireAuth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,31 +20,31 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get('q');
 
     if (!q) {
-      return NextResponse.json({ success: true, data: { clients: [], banks: [], commissions: [] } });
+      return NextResponse.json({ 
+        success: true, 
+        data: { 
+          clients: [], 
+          banks: [], 
+          commissions: [],
+          expenses: [],
+          loans: [],
+          payments: [],
+          employees: []
+        } 
+      });
     }
 
     const regex = { $regex: q, $options: 'i' };
 
     // 1. Search Clients
-    const clientsPromise = Client.aggregate([
-      {
-        $addFields: {
-          dateString: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }
-        }
-      },
-      {
-        $match: {
-          $or: [
-            { personName: regex },
-            { mobileNumber: regex },
-            { email: regex },
-            { reference: regex },
-            { dateString: regex }
-          ]
-        }
-      },
-      { $limit: 20 }
-    ]);
+    const clientsPromise = Client.find({
+      $or: [
+        { personName: regex },
+        { mobileNumber: regex },
+        { email: regex },
+        { reference: regex }
+      ]
+    }).limit(20).lean();
 
     // 2. Search Banks
     const banksPromise = Bank.find({
@@ -100,10 +106,50 @@ export async function GET(request: NextRequest) {
       { $limit: 20 }
     ]);
 
-    const [clients, banks, commissions] = await Promise.all([
+    // 4. Search Expenses
+    const expensesPromise = Expense.find({
+      $or: [
+        { title: regex },
+        { notes: regex },
+        { type: regex }
+      ]
+    }).sort({ date: -1 }).limit(20).lean();
+
+    // 5. Search Loans
+    const loansPromise = Loan.find({
+      $or: [
+        { borrowerName: regex },
+        { notes: regex },
+        { duration: regex },
+        { status: regex }
+      ]
+    }).sort({ createdAt: -1 }).limit(20).lean();
+
+    // 6. Search Bank Payments
+    const paymentsPromise = BankPayment.find({
+      $or: [
+        { referenceName: regex },
+        { note: regex },
+        { paymentMode: regex }
+      ]
+    }).sort({ date: -1 }).limit(20).lean();
+
+    // 7. Search Employees
+    const employeesPromise = Employee.find({
+      $or: [
+        { name: regex },
+        { mobileNumber: regex }
+      ]
+    }).limit(20).lean();
+
+    const [clients, banks, commissions, expenses, loans, payments, employees] = await Promise.all([
       clientsPromise,
       banksPromise,
-      commissionsPromise
+      commissionsPromise,
+      expensesPromise,
+      loansPromise,
+      paymentsPromise,
+      employeesPromise
     ]);
 
     return NextResponse.json({
@@ -111,7 +157,11 @@ export async function GET(request: NextRequest) {
       data: {
         clients,
         banks,
-        commissions
+        commissions,
+        expenses,
+        loans,
+        payments,
+        employees
       }
     });
   } catch (error) {

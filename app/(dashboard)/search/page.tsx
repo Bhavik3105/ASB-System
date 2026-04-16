@@ -2,14 +2,33 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search as SearchIcon, Users, Building2, Wallet, ArrowRight, Loader2 } from 'lucide-react';
+import { 
+  Search as SearchIcon, 
+  Users, 
+  Building2, 
+  Wallet, 
+  ArrowRight, 
+  Loader2, 
+  Receipt, 
+  Landmark, 
+  CreditCard, 
+  UserCircle 
+} from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function SearchResultsPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = useState<any>({ clients: [], banks: [], commissions: [] });
+  const [results, setResults] = useState<any>({ 
+    clients: [], 
+    banks: [], 
+    commissions: [],
+    expenses: [],
+    loans: [],
+    payments: [],
+    employees: []
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +63,7 @@ export default function SearchResultsPage() {
     );
   }
 
-  const hasResults = results.clients.length > 0 || results.banks.length > 0 || results.commissions.length > 0;
+  const hasResults = Object.values(results).some((arr: any) => arr.length > 0);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -67,13 +86,13 @@ export default function SearchResultsPage() {
           </div>
           <h2 className="text-xl font-semibold text-slate-200 mb-2">No matching records found</h2>
           <p className="text-slate-500 max-w-sm mx-auto">
-            We couldn't find anything matching your search in Clients, Banks, or Commissions. Try a different name or number.
+            We couldn't find anything matching your search. Try a different name, date, or amount.
           </p>
         </div>
       ) : (
         <div className="space-y-12">
           {/* Clients Section */}
-          {results.clients.length > 0 && (
+          {results.clients?.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
                 <Users className="w-5 h-5 text-cyan-500" />
@@ -101,7 +120,7 @@ export default function SearchResultsPage() {
           )}
 
           {/* Banks Section */}
-          {results.banks.length > 0 && (
+          {results.banks?.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
                 <Building2 className="w-5 h-5 text-purple-500" />
@@ -125,8 +144,120 @@ export default function SearchResultsPage() {
             </section>
           )}
 
+          {/* Expenses Section */}
+          {results.expenses?.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
+                <Receipt className="w-5 h-5 text-rose-500" />
+                <h2 className="font-semibold text-lg">Found in Expenses ({results.expenses.length})</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {results.expenses.map((expense: any) => (
+                  <Link key={expense._id} href="/expenses" 
+                    className="card p-4 hover:border-rose-500/50 hover:bg-rose-500/5 group transition-all">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-bold text-slate-100 group-hover:text-rose-400 transition-colors">{expense.title}</h3>
+                        <p className="text-xs text-slate-500">{expense.type}</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-slate-700 group-hover:text-rose-500 transition-all group-hover:translate-x-1" />
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-xs text-slate-500">{formatDate(expense.date)}</span>
+                      <span className="text-sm font-semibold text-rose-400">{formatCurrency(expense.amount)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Loans Section */}
+          {results.loans?.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
+                <Landmark className="w-5 h-5 text-indigo-500" />
+                <h2 className="font-semibold text-lg">Found in Loans ({results.loans.length})</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {results.loans.map((loan: any) => (
+                  <Link key={loan._id} href="/loans" 
+                    className="card p-4 hover:border-indigo-500/50 hover:bg-indigo-500/5 group transition-all">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-bold text-slate-100 group-hover:text-indigo-400 transition-colors">{loan.borrowerName}</h3>
+                        <p className="text-xs text-slate-500">{loan.status}</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-slate-700 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-xs text-slate-500">Principal:</span>
+                      <span className="text-sm font-semibold text-indigo-400">{formatCurrency(loan.principalAmount)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Bank Payments Section */}
+          {results.payments?.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
+                <CreditCard className="w-5 h-5 text-emerald-500" />
+                <h2 className="font-semibold text-lg">Found in Bank Payments ({results.payments.length})</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {results.payments.map((payment: any) => (
+                  <Link key={payment._id} href="/bank-payments" 
+                    className="card p-4 hover:border-emerald-500/50 hover:bg-emerald-500/5 group transition-all">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">{payment.referenceName}</h3>
+                        <p className="text-xs text-slate-500">{payment.paymentMode}</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-slate-700 group-hover:text-emerald-500 transition-all group-hover:translate-x-1" />
+                    </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-xs text-slate-500">{formatDate(payment.date)}</span>
+                      <span className="text-sm font-semibold text-emerald-400">{formatCurrency(payment.amount)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Employees Section */}
+          {results.employees?.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
+                <UserCircle className="w-5 h-5 text-amber-500" />
+                <h2 className="font-semibold text-lg">Found in Employees ({results.employees.length})</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {results.employees.map((emp: any) => (
+                  <Link key={emp._id} href="/salary" 
+                    className="card p-4 hover:border-amber-500/50 hover:bg-amber-500/5 group transition-all">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-bold text-slate-100 group-hover:text-amber-400 transition-colors">{emp.name}</h3>
+                        <p className="text-xs text-slate-500">{emp.mobileNumber || 'No mobile'}</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-slate-700 group-hover:text-amber-500 transition-all group-hover:translate-x-1" />
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-slate-800/50">
+                      <span className="text-xs text-slate-500">Base Salary:</span>
+                      <p className="text-sm font-semibold text-amber-500">{formatCurrency(emp.baseSalary)}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Commissions Section */}
-          {results.commissions.length > 0 && (
+          {results.commissions?.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2 text-slate-400 mb-2 px-2">
                 <Wallet className="w-5 h-5 text-amber-500" />
