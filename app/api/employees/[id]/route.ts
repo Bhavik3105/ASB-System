@@ -27,12 +27,16 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     await requireAuth();
     const { id } = await params;
     
-    // We do a soft delete or hard delete?
-    // User said "delete option i salary section, if sometime client want to delete the entry he should be able to do it"
-    // And to my proposal "delete Employee record entirely" they said "ok do it"
-    
+    // Delete the employee
     const deleted = await Employee.findByIdAndDelete(id);
     if (!deleted) return NextResponse.json({ success: false, error: 'Employee not found' }, { status: 404 });
+    
+    // Cascade delete: Remove all associated salary records
+    // We import Salary dynamically to avoid circular dependencies if any, or just import it at the top. 
+    // Wait, the file doesn't have it at top. I'll just use mongoose.model.
+    const mongoose = require('mongoose');
+    const Salary = mongoose.models.Salary || mongoose.model('Salary');
+    await Salary.deleteMany({ employeeId: id });
     
     return NextResponse.json({ success: true, data: deleted });
   } catch (error) {
