@@ -57,7 +57,7 @@ export default function BankLimitsPage() {
     { 
       header: 'Limit', 
       accessor: (row: any) => (
-        <span className="font-bold text-slate-500">
+        <span className="font-bold text-sky-400">
           {row.dailyLimit > 0 ? formatCurrency(row.dailyLimit) : 'No Limit Set'}
         </span>
       )
@@ -83,11 +83,11 @@ export default function BankLimitsPage() {
     },
     { 
       header: 'Status', 
-      accessor: (row: any) => (
-        <span className={row.isActive ? 'badge-success' : 'badge-danger'}>
-          {row.isActive ? 'Active' : 'Inactive'}
-        </span>
-      )
+      accessor: (row: any) => {
+        const status = row.qrStatus || 'Active';
+        const cls = status === 'Active' ? 'badge-success' : status === 'Freeze' ? 'badge-danger' : 'bg-sky-500/10 text-sky-500 border border-sky-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider';
+        return <span className={cls}>{status}</span>;
+      }
     },
     { header: 'Actions', accessor: (row: any) => (
        <div className="flex gap-2 items-center">
