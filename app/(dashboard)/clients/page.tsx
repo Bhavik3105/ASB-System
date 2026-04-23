@@ -81,6 +81,7 @@ export default function ClientsPage() {
   const columns = [
     { header: 'Name', accessor: 'personName' },
     { header: 'Mobile', accessor: 'mobileNumber' },
+    { header: 'Bank Name', accessor: (row: any) => row.bankName || '-' },
     { header: 'Bank Type', accessor: (row: any) => row.bankType || '-' },
     { header: 'Reference', accessor: (row: any) => row.reference || '-' },
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },

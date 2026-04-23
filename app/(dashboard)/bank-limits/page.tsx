@@ -36,8 +36,8 @@ export default function BankLimitsPage() {
   };
 
   const columns = [
-    { header: 'Bank Name', accessor: 'bankName' },
-    { header: 'Holder', accessor: 'accountHolderName' },
+    { header: 'Bank Name', accessor: (row: any) => row.clientBankName || row.bankName || '-' },
+    { header: 'Holder', accessor: (row: any) => row.clientPersonName || row.accountHolderName || '-' },
     { header: 'A/C Number', accessor: 'accountNumber' },
     { 
       header: 'Daily Limit', 

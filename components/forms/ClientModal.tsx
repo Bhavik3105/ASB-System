@@ -17,6 +17,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     personName: '',
     mobileNumber: '',
     email: '',
+    bankName: '',
     bankType: '',
     reference: '',
     depositAmount: '',
@@ -123,6 +124,16 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
 
             <div className="grid grid-cols-2 gap-4">
               <div>
+                <label className="label">Bank Name</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={form.bankName}
+                  onChange={(e) => setForm({ ...form, bankName: e.target.value })}
+                  placeholder="e.g. HDFC, SBI"
+                />
+              </div>
+              <div>
                 <label className="label">Bank Type</label>
                 <select
                   className="select"
@@ -134,6 +145,9 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   <option value="Current">Current</option>
                 </select>
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Reference</label>
                 <input
@@ -143,9 +157,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, reference: e.target.value })}
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Deposit Amount</label>
                 <input
@@ -157,6 +168,9 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, depositAmount: e.target.value })}
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Buying Price</label>
                 <input
@@ -168,9 +182,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, buyingPrice: e.target.value })}
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Business Type</label>
                 <input
@@ -180,6 +191,9 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, businessType: e.target.value })}
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Status</label>
                 <select
@@ -191,17 +205,16 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   <option value="Frozen">Frozen</option>
                 </select>
               </div>
-            </div>
-
-            <div>
-              <label className="label">Purchase Date</label>
-              <input
-                type="date"
-                className="input"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-                required
-              />
+              <div>
+                <label className="label">Purchase Date</label>
+                <input
+                  type="date"
+                  className="input"
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
+                  required
+                />
+              </div>
             </div>
           </div>
 

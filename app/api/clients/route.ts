@@ -135,14 +135,14 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { personName, banks, mobileNumber, email, bankType, reference, depositAmount, buyingPrice, businessType, date, totalAmount, status } = body;
+    const { personName, bankName, banks, mobileNumber, email, bankType, reference, depositAmount, buyingPrice, businessType, date, totalAmount, status } = body;
 
     if (!personName || !mobileNumber || !date) {
       return NextResponse.json({ success: false, error: 'personName, mobileNumber, date are required' }, { status: 400 });
     }
 
     const client = await Client.create({
-      personName, banks: banks || [], mobileNumber, email, bankType,
+      personName, bankName, banks: banks || [], mobileNumber, email, bankType,
       reference, 
       depositAmount: Number(depositAmount || 0), 
       buyingPrice: Number(buyingPrice || 0),
@@ -151,6 +151,19 @@ export async function POST(request: NextRequest) {
       status: status || 'Active',
       createdBy: session.userId,
     });
+
+    // Auto-create a Bank limit record and link it to this Client
+    const newBank = await Bank.create({
+      bankName: bankName || 'Pending',
+      accountHolderName: personName,
+      accountNumber: 'Pending', // Default value since Bank Purchase doesn't ask for it initially
+      dailyLimit: 0,
+      qrStatus: 'Active',
+      createdBy: session.userId,
+    });
+
+    client.banks.push(newBank._id);
+    await client.save();
 
     return NextResponse.json({ success: true, data: client }, { status: 201 });
   } catch (error: any) {

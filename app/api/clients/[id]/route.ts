@@ -25,6 +25,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { id } = await params;
     const deleted = await Client.findByIdAndDelete(id);
     if (!deleted) return NextResponse.json({ success: false, error: 'Client not found' }, { status: 404 });
+    
+    // Cascade delete: Remove the associated Bank records
+    if (deleted.banks && deleted.banks.length > 0) {
+      const mongoose = require('mongoose');
+      const Bank = mongoose.models.Bank || mongoose.model('Bank');
+      await Bank.deleteMany({ _id: { $in: deleted.banks } });
+    }
+
     return NextResponse.json({ success: true, data: deleted });
   } catch (error) {
     console.error(error);

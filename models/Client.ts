@@ -4,6 +4,7 @@ export interface IClient extends Document {
   personName: string;
   mobileNumber: string;
   email?: string;
+  bankName?: string;
   bankType?: string;
   reference?: string;
   banks: mongoose.Types.ObjectId[];
@@ -24,6 +25,7 @@ const ClientSchema = new Schema<IClient>(
     personName: { type: String, required: true, trim: true },
     mobileNumber: { type: String, required: true, trim: true },
     email: { type: String, trim: true, lowercase: true },
+    bankName: { type: String, trim: true },
     bankType: { type: String, trim: true },
     reference: { type: String, trim: true },
     banks: [{ type: Schema.Types.ObjectId, ref: 'Bank' }],

@@ -22,8 +22,29 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    const pipeline: any[] = [
+      { $match: filter },
+      { $sort: { createdAt: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'clients',
+          localField: '_id',
+          foreignField: 'banks',
+          as: 'clientDetails'
+        }
+      },
+      {
+        $addFields: {
+          clientPersonName: { $arrayElemAt: ['$clientDetails.personName', 0] },
+          clientBankName: { $arrayElemAt: ['$clientDetails.bankName', 0] }
+        }
+      }
+    ];
+
     const [banks, total] = await Promise.all([
-      Bank.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+      Bank.aggregate(pipeline),
       Bank.countDocuments(filter),
     ]);
 
