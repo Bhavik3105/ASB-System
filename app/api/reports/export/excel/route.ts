@@ -98,6 +98,19 @@ export async function GET(request: NextRequest) {
       XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Banks');
     }
 
+    // ── BANK LIMITS ───────────────────────────────────────────────────
+    if (module === 'all' || module === 'bank-limits') {
+      const bankLimits = await Bank.find({}).lean();
+      const data = bankLimits.map((b) => ({
+        'Bank Name': b.bankName,
+        'Account Holder': b.accountHolderName,
+        'Limit (₹)': b.dailyLimit || 0,
+        'Use Limit (₹)': b.useLimit || 0,
+        'Daily Limit (₹)': Math.max(0, (b.dailyLimit || 0) - (b.useLimit || 0)),
+        Status: b.isActive ? 'Active' : 'Inactive',
+      }));
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.length ? data : [{}]), 'Bank Limits');
+    }
 
 
     // ── LOANS ──────────────────────────────────────────────────────

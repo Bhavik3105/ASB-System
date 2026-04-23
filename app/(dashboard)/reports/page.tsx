@@ -12,6 +12,7 @@ import {
   Building2,
   Users,
   BarChart3,
+  ShieldCheck,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -109,6 +110,17 @@ const sections: SectionCard[] = [
     iconColor: 'text-amber-600',
     borderColor: 'border-amber-200',
     module: 'banks',
+    dateScope: 'all',
+  },
+  {
+    id: 'bank-limits',
+    title: 'Bank Limits',
+    description: 'Bank limit details — limit, used limit, daily remaining, and status for all accounts.',
+    icon: ShieldCheck,
+    color: 'bg-teal-50',
+    iconColor: 'text-teal-600',
+    borderColor: 'border-teal-200',
+    module: 'bank-limits',
     dateScope: 'all',
   },
 ];
