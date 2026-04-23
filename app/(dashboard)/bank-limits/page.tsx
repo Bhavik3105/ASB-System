@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/tables/DataTable';
-import { ShieldCheck, Pencil, Landmark } from 'lucide-react';
+import { ShieldCheck, Pencil, Landmark, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '@/lib/utils';
 import BankModal from '@/components/forms/BankModal';
@@ -30,6 +30,22 @@ export default function BankLimitsPage() {
 
   useEffect(() => { fetchBanks(search); }, [search]);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this bank limit?')) return;
+    try {
+      const res = await fetch(`/api/banks/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Bank limit deleted');
+        fetchBanks(search);
+      } else {
+        toast.error(data.error || 'Failed to delete');
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  };
+
   const openModal = (bank?: any) => {
     setEditingBank(bank || null);
     setIsModalOpen(true);
@@ -38,14 +54,32 @@ export default function BankLimitsPage() {
   const columns = [
     { header: 'Bank Name', accessor: (row: any) => row.clientBankName || row.bankName || '-' },
     { header: 'Holder', accessor: (row: any) => row.clientPersonName || row.accountHolderName || '-' },
-    { header: 'A/C Number', accessor: 'accountNumber' },
     { 
-      header: 'Daily Limit', 
+      header: 'Limit', 
       accessor: (row: any) => (
-        <span className="font-bold text-emerald-600">
+        <span className="font-bold text-slate-500">
           {row.dailyLimit > 0 ? formatCurrency(row.dailyLimit) : 'No Limit Set'}
         </span>
       )
+    },
+    { 
+      header: 'Use Limit', 
+      accessor: (row: any) => (
+        <span className="font-bold text-rose-500">
+          {formatCurrency(row.useLimit || 0)}
+        </span>
+      )
+    },
+    { 
+      header: 'Daily Limit', 
+      accessor: (row: any) => {
+        const remaining = Math.max(0, (row.dailyLimit || 0) - (row.useLimit || 0));
+        return (
+          <span className="font-bold text-emerald-500">
+            {formatCurrency(remaining)}
+          </span>
+        );
+      }
     },
     { 
       header: 'Status', 
@@ -55,11 +89,17 @@ export default function BankLimitsPage() {
         </span>
       )
     },
-    { header: 'Edit Limit', accessor: (row: any) => (
-       <button onClick={() => openModal(row)} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all group">
-         <Pencil className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> 
-         <span>Adjust</span>
-       </button>
+    { header: 'Actions', accessor: (row: any) => (
+       <div className="flex gap-2 items-center">
+         <button onClick={() => openModal(row)} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all group">
+           <Pencil className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> 
+           <span>Adjust</span>
+         </button>
+         <button onClick={() => handleDelete(row._id)} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all group">
+           <Trash2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> 
+           <span>Delete</span>
+         </button>
+       </div>
     )},
   ];
 

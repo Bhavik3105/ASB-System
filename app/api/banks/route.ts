@@ -22,6 +22,12 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
     const pipeline: any[] = [
       { $match: filter },
       { $sort: { createdAt: -1 } },
@@ -64,7 +70,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
     const session = await requireAuth();
     const body = await request.json();
-    const { bankName, accountHolderName, accountNumber, qrStatus, dailyLimit } = body;
+    const { bankName, accountHolderName, accountNumber, qrStatus, dailyLimit, useLimit, remainingLimit } = body;
 
     if (!bankName || !accountHolderName || !accountNumber) {
       return NextResponse.json(
@@ -77,6 +83,8 @@ export async function POST(request: NextRequest) {
       bankName, accountHolderName, accountNumber,
       qrStatus,
       dailyLimit: Number(dailyLimit || 0),
+      useLimit: Number(useLimit || 0),
+      remainingLimit: Number(remainingLimit || 0),
       createdBy: session.userId,
     });
 

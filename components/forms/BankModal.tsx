@@ -19,6 +19,8 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
     accountNumber: '',
     qrStatus: 'Active',
     dailyLimit: 0,
+    useLimit: 0,
+    remainingLimit: 0,
   };
   const [form, setForm] = useState(defaultForm);
 
@@ -31,6 +33,8 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
           accountNumber: initialData.accountNumber || '',
           qrStatus: initialData.qrStatus || 'Active',
           dailyLimit: initialData.dailyLimit || 0,
+          useLimit: initialData.useLimit || 0,
+          remainingLimit: initialData.remainingLimit || 0,
         });
       } else {
         setForm(defaultForm);
@@ -128,15 +132,38 @@ export default function BankModal({ isOpen, onClose, onSuccess, initialData }: B
               </div>
             </div>
 
-            <div>
-              <label className="label">Daily Limit (₹)</label>
-              <input
-                type="number"
-                className="input !bg-slate-900/30"
-                placeholder="500000"
-                value={form.dailyLimit}
-                onChange={(e) => setForm({ ...form, dailyLimit: parseFloat(e.target.value) || 0 })}
-              />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="label">Limit (₹)</label>
+                <input
+                  type="number"
+                  className="input !bg-slate-900/30"
+                  placeholder="50000"
+                  value={form.dailyLimit}
+                  onChange={(e) => setForm({ ...form, dailyLimit: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div>
+                <label className="label">Use Limit (₹)</label>
+                <input
+                  type="number"
+                  className="input !bg-slate-900/30"
+                  placeholder="10000"
+                  value={form.useLimit}
+                  onChange={(e) => setForm({ ...form, useLimit: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div>
+                <label className="label">Daily Limit (₹)</label>
+                <input
+                  type="number"
+                  className="input !bg-slate-900/30 opacity-50 cursor-not-allowed"
+                  placeholder="40000"
+                  value={Math.max(0, (form.dailyLimit || 0) - (form.useLimit || 0))}
+                  readOnly
+                  disabled
+                />
+              </div>
             </div>
           </div>
 

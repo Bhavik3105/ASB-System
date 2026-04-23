@@ -16,6 +16,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (updateData.dailyLimit !== undefined) {
       updateData.dailyLimit = Number(updateData.dailyLimit || 0);
     }
+    if (updateData.useLimit !== undefined) {
+      updateData.useLimit = Number(updateData.useLimit || 0);
+    }
+    if (updateData.remainingLimit !== undefined) {
+      updateData.remainingLimit = Number(updateData.remainingLimit || 0);
+    }
 
     const updated = await Bank.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
     if (!updated) return NextResponse.json({ success: false, error: 'Bank not found' }, { status: 404 });
