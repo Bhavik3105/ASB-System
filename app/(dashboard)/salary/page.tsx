@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import EmployeeModal from '@/components/forms/EmployeeModal';
 import SalaryModal from '@/components/forms/SalaryModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function SalaryPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function SalaryPage() {
   const [isEmpModalOpen, setIsEmpModalOpen] = useState(false);
   const [isSalModalOpen, setIsSalModalOpen] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState<any>(null);
+  const { isViewer } = useRole();
 
   const fetchSalaries = async () => {
     try {
@@ -122,7 +124,7 @@ export default function SalaryPage() {
         </span>
       )
     },
-    {
+    ...(!isViewer ? [{
       header: 'Actions', accessor: (row: any) => (
         <div className="flex items-center gap-2">
           <button onClick={() => openSalModal(row)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg border border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
@@ -148,7 +150,7 @@ export default function SalaryPage() {
           )}
         </div>
       )
-    },
+    }] : []),
 
   ];
 
@@ -190,9 +192,11 @@ export default function SalaryPage() {
               ))}
             </select>
           </div>
-          <button className="btn-primary" onClick={() => openEmpModal()}>
-            <Plus className="w-4 h-4" /> Add Employee
-          </button>
+          {!isViewer && (
+            <button className="btn-primary" onClick={() => openEmpModal()}>
+              <Plus className="w-4 h-4" /> Add Employee
+            </button>
+          )}
         </div>
       </div>
 

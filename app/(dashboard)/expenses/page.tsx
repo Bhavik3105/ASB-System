@@ -6,12 +6,14 @@ import { IndianRupee, Plus, Receipt, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import ExpenseModal from '@/components/forms/ExpenseModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function ExpensesPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<any>(null);
+  const { isViewer } = useRole();
 
   const fetchExpenses = async () => {
     try {
@@ -56,7 +58,7 @@ export default function ExpensesPage() {
        <span className={row.type === 'Business' ? 'badge-info' : 'badge-warning'}>{row.type}</span>
     )},
     { header: 'Amount', accessor: (row: any) => <span className="font-bold text-slate-200">{formatCurrency(row.amount)}</span> },
-    { header: 'Actions', accessor: (row: any) => (
+    ...(!isViewer ? [{ header: 'Actions', accessor: (row: any) => (
        <div className="flex gap-2">
          <button onClick={() => openModal(row)} className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
            <Pencil className="w-4 h-4" />
@@ -65,7 +67,7 @@ export default function ExpensesPage() {
            <Trash2 className="w-4 h-4" />
          </button>
        </div>
-    )},
+    )}] : []),
   ];
 
   return (
@@ -80,9 +82,11 @@ export default function ExpensesPage() {
              <p className="text-slate-500 font-medium mt-0.5">Track and manage your home and business expenses.</p>
            </div>
          </div>
-         <button className="btn-primary" onClick={() => openModal()}>
-           <Plus className="w-4 h-4" /> Add Expense
-         </button>
+         {!isViewer && (
+           <button className="btn-primary" onClick={() => openModal()}>
+             <Plus className="w-4 h-4" /> Add Expense
+           </button>
+         )}
       </div>
       
       <DataTable columns={columns} data={data} loading={loading} />

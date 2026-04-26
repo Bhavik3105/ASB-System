@@ -41,3 +41,9 @@ export async function requireAuth(): Promise<JWTPayload> {
   if (!session) throw new Error('Unauthorized');
   return session;
 }
+
+export async function requireEditor(): Promise<JWTPayload> {
+  const session = await requireAuth();
+  if (session.role === 'viewer') throw new Error('Forbidden: View-only access');
+  return session;
+}

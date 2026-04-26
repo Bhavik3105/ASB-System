@@ -7,6 +7,7 @@ import { Landmark, Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '@/lib/utils';
 import BankModal from '@/components/forms/BankModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function BanksPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function BanksPage() {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<any>(null);
+  const { isViewer } = useRole();
 
   const fetchBanks = async (searchTerm = '') => {
     try {
@@ -71,7 +73,7 @@ export default function BanksPage() {
         </span>
       ) 
     },
-    { 
+    ...(!isViewer ? [{ 
       header: 'Actions', 
       accessor: (row: any) => (
        <div className="flex gap-2">
@@ -82,7 +84,7 @@ export default function BanksPage() {
            <Trash2 className="w-4 h-4" />
          </button>
        </div>
-    )},
+    )}] : []),
   ];
 
   return (
@@ -97,9 +99,11 @@ export default function BanksPage() {
              <p className="text-[var(--text-secondary)] font-medium mt-0.5">Manage payout and collection accounts.</p>
            </div>
          </div>
-         <button className="btn-primary" onClick={() => openModal()}>
-           <Plus className="w-4 h-4" /> Add Bank
-         </button>
+         {!isViewer && (
+           <button className="btn-primary" onClick={() => openModal()}>
+             <Plus className="w-4 h-4" /> Add Bank
+           </button>
+         )}
       </div>
       
       <DataTable

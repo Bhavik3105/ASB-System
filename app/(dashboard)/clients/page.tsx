@@ -7,6 +7,7 @@ import { Users, Plus, Pencil, Trash2, Landmark } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import ClientModal from '@/components/forms/ClientModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function ClientsPage() {
   const searchParams = useSearchParams();
@@ -18,6 +19,7 @@ export default function ClientsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
   const [debugInfo, setDebugInfo] = useState<any>(null);
+  const { isViewer } = useRole();
 
 
   useEffect(() => {
@@ -92,7 +94,7 @@ export default function ClientsPage() {
          {row.status || 'Active'}
        </span>
     )},
-    { header: 'Actions', accessor: (row: any) => (
+    ...(!isViewer ? [{ header: 'Actions', accessor: (row: any) => (
        <div className="flex gap-2">
          <button onClick={() => openAppModal(row)} className="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
            <Pencil className="w-4 h-4" />
@@ -101,7 +103,7 @@ export default function ClientsPage() {
            <Trash2 className="w-4 h-4" />
          </button>
        </div>
-    )},
+    )}] : []),
   ];
 
   return (
@@ -111,9 +113,11 @@ export default function ClientsPage() {
            <h1 className="page-title flex items-center gap-2"><Users className="w-6 h-6 text-cyan-500" /> Bank Purchase</h1>
            <p className="page-subtitle">Bank purchase directory and account information.</p>
          </div>
-         <button className="btn-primary" onClick={() => openAppModal()}>
-           <Plus className="w-4 h-4" /> Add Record
-         </button>
+         {!isViewer && (
+           <button className="btn-primary" onClick={() => openAppModal()}>
+             <Plus className="w-4 h-4" /> Add Record
+           </button>
+         )}
       </div>
       
       {debugInfo && Boolean(debugInfo.rawCount > 0 && data.length === 0) && (

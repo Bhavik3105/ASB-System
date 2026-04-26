@@ -6,6 +6,7 @@ import { CreditCard, Plus, Trash2, History, ListFilter, Pencil } from 'lucide-re
 import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import BankPaymentModal from '@/components/forms/BankPaymentModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function BankPaymentsPage() {
   const [ledger, setLedger] = useState([]);
@@ -14,6 +15,7 @@ export default function BankPaymentsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'summary' | 'history'>('summary');
+  const { isViewer } = useRole();
 
   const fetchData = async () => {
     try {
@@ -74,7 +76,7 @@ export default function BankPaymentsPage() {
     },
     { header: 'Payment Date', accessor: (row: any) => row.lastPaymentDate ? formatDate(row.lastPaymentDate) : '-' },
     { header: 'Payment Mode', accessor: (row: any) => row.lastPaymentMode || '-' },
-    { header: 'Actions', accessor: (row: any) => (
+    ...(!isViewer ? [{ header: 'Actions', accessor: (row: any) => (
        <div className="flex items-center gap-2">
          {row.latestPayment ? (
            <>
@@ -87,7 +89,7 @@ export default function BankPaymentsPage() {
            </>
          ) : <span className="text-xs text-slate-600 italic">No payments</span>}
        </div>
-    )},
+    )}] : []),
   ];
 
   const historyColumns = [
@@ -96,7 +98,7 @@ export default function BankPaymentsPage() {
     { header: 'Amount', accessor: (row: any) => formatCurrency(row.amount) },
     { header: 'Payment Mode', accessor: 'paymentMode' },
     { header: 'Note', accessor: (row: any) => row.note || '-' },
-    { header: 'Actions', accessor: (row: any) => (
+    ...(!isViewer ? [{ header: 'Actions', accessor: (row: any) => (
        <div className="flex items-center gap-2">
          <button onClick={() => handleEdit(row)} className="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
            <Pencil className="w-4 h-4" />
@@ -105,7 +107,7 @@ export default function BankPaymentsPage() {
            <Trash2 className="w-4 h-4" />
          </button>
        </div>
-    )},
+    )}] : []),
   ];
 
   return (
@@ -117,12 +119,14 @@ export default function BankPaymentsPage() {
            </h1>
            <p className="page-subtitle">Track settlements and balances with purchase parties.</p>
          </div>
-         <button className="btn-primary" onClick={() => {
-           setSelectedPayment(null);
-           setIsModalOpen(true);
-         }}>
-           <Plus className="w-4 h-4" /> Add Payment
-         </button>
+         {!isViewer && (
+           <button className="btn-primary" onClick={() => {
+             setSelectedPayment(null);
+             setIsModalOpen(true);
+           }}>
+             <Plus className="w-4 h-4" /> Add Payment
+           </button>
+         )}
       </div>
 
       <div className="flex gap-2 p-1 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-2xl w-fit">

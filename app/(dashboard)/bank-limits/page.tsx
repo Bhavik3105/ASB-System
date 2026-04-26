@@ -6,6 +6,7 @@ import { ShieldCheck, Pencil, Landmark, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '@/lib/utils';
 import BankModal from '@/components/forms/BankModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function BankLimitsPage() {
   const [data, setData] = useState([]);
@@ -13,6 +14,7 @@ export default function BankLimitsPage() {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBank, setEditingBank] = useState<any>(null);
+  const { isViewer } = useRole();
 
   const fetchBanks = async (searchTerm = '') => {
     try {
@@ -89,7 +91,7 @@ export default function BankLimitsPage() {
         return <span className={cls}>{status}</span>;
       }
     },
-    { header: 'Actions', accessor: (row: any) => (
+    ...(!isViewer ? [{ header: 'Actions', accessor: (row: any) => (
        <div className="flex gap-2 items-center">
          <button onClick={() => openModal(row)} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all group">
            <Pencil className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> 
@@ -100,7 +102,7 @@ export default function BankLimitsPage() {
            <span>Delete</span>
          </button>
        </div>
-    )},
+    )}] : []),
   ];
 
   return (

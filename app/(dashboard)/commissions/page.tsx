@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import TransactionModal from '@/components/forms/TransactionModal';
 import DailyBreakdownModal from '@/components/forms/DailyBreakdownModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function CommissionsPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function CommissionsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
+  const { isViewer } = useRole();
   
   const [filters, setFilters] = useState({
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -107,7 +109,7 @@ export default function CommissionsPage() {
         </div>
       )
     },
-    { 
+    ...(!isViewer ? [{ 
       header: 'Actions', 
       accessor: (row: any) => (
         <div className="flex items-center gap-2">
@@ -128,7 +130,7 @@ export default function CommissionsPage() {
           </button>
         </div>
       )
-    },
+    }] : []),
   ];
 
   const totalDeposits = data.reduce((sum, row: any) => sum + (row.deposits || 0), 0);
@@ -169,9 +171,11 @@ export default function CommissionsPage() {
             </div>
           </div>
 
-          <button className="btn-primary" onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="w-4 h-4" /> Add Commission
-          </button>
+          {!isViewer && (
+            <button className="btn-primary" onClick={() => setIsAddModalOpen(true)}>
+              <Plus className="w-4 h-4" /> Add Commission
+            </button>
+          )}
         </div>
       </div>
 

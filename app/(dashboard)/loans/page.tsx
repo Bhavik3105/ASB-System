@@ -20,6 +20,7 @@ import {
 import toast from 'react-hot-toast';
 import LoanModal from '@/components/forms/LoanModal';
 import RepaymentModal from '@/components/forms/RepaymentModal';
+import { useRole } from '@/contexts/RoleContext';
 
 export default function LoansPage() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function LoansPage() {
   const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
   const [isRepayModalOpen, setIsRepayModalOpen] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
+  const { isViewer } = useRole();
 
   const fetchLoans = async () => {
     try {
@@ -91,13 +93,15 @@ export default function LoansPage() {
           <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">Loan Management</h1>
           <p className="text-[var(--text-secondary)] mt-1 font-medium">Track lending, interest, and incoming repayments.</p>
         </div>
-        <button 
-          onClick={() => { setSelectedLoan(null); setIsLoanModalOpen(true); }}
-          className="btn-primary"
-        >
-          <Plus className="w-5 h-5" />
-          Give New Loan
-        </button>
+        {!isViewer && (
+          <button 
+            onClick={() => { setSelectedLoan(null); setIsLoanModalOpen(true); }}
+            className="btn-primary"
+          >
+            <Plus className="w-5 h-5" />
+            Give New Loan
+          </button>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -235,30 +239,32 @@ export default function LoansPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={() => { setSelectedLoan(loan); setIsRepayModalOpen(true); }}
-                      disabled={loan.status === 'Settled'}
-                      className="flex-1 btn-primary py-2.5 text-xs justify-center disabled:opacity-30 disabled:grayscale"
-                    >
-                      <ArrowDownLeft className="w-4 h-4" />
-                      Collect Payment
-                    </button>
-                    <button 
-                      onClick={() => { setSelectedLoan(loan); setIsLoanModalOpen(true); }}
-                      className="px-5 py-2.5 bg-slate-800/50 text-slate-300 rounded-2xl border border-slate-700 hover:bg-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition-all text-xs font-bold"
-                      title="Edit Loan Details"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteLoan(loan._id)}
-                      className="p-2.5 bg-rose-500/10 text-rose-500 rounded-2xl border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all group/del"
-                      title="Delete Loan Permanently"
-                    >
-                      <Trash2 className="w-4 h-4 group-hover/del:scale-110 transition-transform" />
-                    </button>
-                  </div>
+                  {!isViewer && (
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => { setSelectedLoan(loan); setIsRepayModalOpen(true); }}
+                        disabled={loan.status === 'Settled'}
+                        className="flex-1 btn-primary py-2.5 text-xs justify-center disabled:opacity-30 disabled:grayscale"
+                      >
+                        <ArrowDownLeft className="w-4 h-4" />
+                        Collect Payment
+                      </button>
+                      <button 
+                        onClick={() => { setSelectedLoan(loan); setIsLoanModalOpen(true); }}
+                        className="px-5 py-2.5 bg-slate-800/50 text-slate-300 rounded-2xl border border-slate-700 hover:bg-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition-all text-xs font-bold"
+                        title="Edit Loan Details"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteLoan(loan._id)}
+                        className="p-2.5 bg-rose-500/10 text-rose-500 rounded-2xl border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all group/del"
+                        title="Delete Loan Permanently"
+                      >
+                        <Trash2 className="w-4 h-4 group-hover/del:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
