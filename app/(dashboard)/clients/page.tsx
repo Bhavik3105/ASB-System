@@ -85,6 +85,8 @@ export default function ClientsPage() {
     { header: 'Mobile', accessor: 'mobileNumber' },
     { header: 'Bank Name', accessor: (row: any) => row.bankName || '-' },
     { header: 'Bank Type', accessor: (row: any) => row.bankType || '-' },
+    { header: 'A/C Number', accessor: (row: any) => <span className="font-mono text-slate-400">{row.accountNumber || '-'}</span> },
+    { header: 'IFSC Code', accessor: (row: any) => <span className="font-mono text-slate-400">{row.ifscCode || '-'}</span> },
     { header: 'Reference', accessor: (row: any) => row.reference || '-' },
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },
     { header: 'Deposit Amt', accessor: (row: any) => formatCurrency(row.depositAmount) },

@@ -19,6 +19,8 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     email: '',
     bankName: '',
     bankType: '',
+    accountNumber: '',
+    ifscCode: '',
     reference: '',
     depositAmount: '',
     buyingPrice: '',
@@ -144,6 +146,29 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   <option value="Savings">Savings</option>
                   <option value="Current">Current</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="label">Account Number</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={form.accountNumber}
+                  onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
+                  placeholder="e.g. 1234567890"
+                />
+              </div>
+              <div>
+                <label className="label">IFSC Code</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={form.ifscCode}
+                  onChange={(e) => setForm({ ...form, ifscCode: e.target.value.toUpperCase() })}
+                  placeholder="e.g. HDFC0001234"
+                />
               </div>
             </div>
 
