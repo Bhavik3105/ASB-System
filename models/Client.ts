@@ -12,6 +12,7 @@ export interface IClient extends Document {
   banks: mongoose.Types.ObjectId[];
   depositAmount: number;
   buyingPrice: number;
+  lienAmount: number;
   businessType?: string;
   date: Date;
   totalAmount: number;
@@ -35,6 +36,7 @@ const ClientSchema = new Schema<IClient>(
     banks: [{ type: Schema.Types.ObjectId, ref: 'Bank' }],
     depositAmount: { type: Number, default: 0, min: 0 },
     buyingPrice: { type: Number, default: 0, min: 0 },
+    lienAmount: { type: Number, default: 0, min: 0 },
     businessType: { type: String, trim: true },
     date: { type: Date, required: true },
     totalAmount: { type: Number, default: 0, min: 0 },

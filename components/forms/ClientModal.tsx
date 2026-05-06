@@ -24,7 +24,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
     reference: '',
     depositAmount: '',
     buyingPrice: '',
-    businessType: '',
+    lienAmount: '',
     status: 'Active',
     date: new Date().toISOString().split('T')[0],
   };
@@ -61,6 +61,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
           ...form,
           depositAmount: form.depositAmount ? parseFloat(form.depositAmount as string) : 0,
           buyingPrice: form.buyingPrice ? parseFloat(form.buyingPrice as string) : 0,
+          lienAmount: form.lienAmount ? parseFloat(form.lienAmount as string) : 0,
         }),
       });
 
@@ -90,7 +91,7 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body space-y-4">
+          <div className="modal-body space-y-4 max-h-[65vh] overflow-y-auto pr-1">
             <div>
               <label className="label">Person Name</label>
               <input
@@ -193,9 +194,20 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, depositAmount: e.target.value })}
                 />
               </div>
+              <div>
+                <label className="label">Lien Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="input"
+                  value={form.lienAmount}
+                  onChange={(e) => setForm({ ...form, lienAmount: e.target.value })}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="label">Buying Price</label>
                 <input
@@ -207,18 +219,6 @@ export default function ClientModal({ isOpen, onClose, onSuccess, initialData }:
                   onChange={(e) => setForm({ ...form, buyingPrice: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="label">Business Type</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={form.businessType}
-                  onChange={(e) => setForm({ ...form, businessType: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Status</label>
                 <select

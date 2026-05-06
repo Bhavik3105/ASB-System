@@ -91,6 +91,7 @@ export default function ClientsPage() {
     { header: 'Date', accessor: (row: any) => formatDate(row.date) },
     { header: 'Deposit Amt', accessor: (row: any) => formatCurrency(row.depositAmount) },
     { header: 'Buying Price', accessor: (row: any) => formatCurrency(row.buyingPrice || 0) },
+    { header: 'Lien Amount', accessor: (row: any) => formatCurrency(row.lienAmount || 0) },
     { header: 'Status', accessor: (row: any) => (
        <span className={row.status === 'Frozen' ? 'badge-warning' : 'badge-success'}>
          {row.status || 'Active'}
@@ -141,6 +142,17 @@ export default function ClientsPage() {
         loading={loading}
         // Removed local search - now handled globally in the Header
       />
+
+      {data.length > 0 && (
+        <div className="mt-6 flex justify-end">
+          <div className="stat-card flex items-center gap-4 px-6 py-4 w-fit">
+            <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-secondary)]">Total Lien Amount</span>
+            <span className="text-2xl font-black text-emerald-500 tracking-tight">
+              {formatCurrency(data.reduce((sum: number, row: any) => sum + (row.lienAmount || 0), 0))}
+            </span>
+          </div>
+        </div>
+      )}
 
       <ClientModal 
         isOpen={isModalOpen} 
