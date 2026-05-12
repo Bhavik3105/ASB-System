@@ -35,7 +35,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <RoleContext.Provider value={{ role, name, isViewer: role === 'viewer', loading }}>
+    <RoleContext.Provider value={{ role, name, isViewer: role !== 'admin' && role !== 'superadmin', loading }}>
       {children}
     </RoleContext.Provider>
   );
